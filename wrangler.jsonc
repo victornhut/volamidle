@@ -9,3 +9,12 @@ jsonc
 "run_worker_first": ["/api/*"]
 }
 }
+jsonc
+"d1_databases": [
+{
+"binding": "DB",
+"database_name": "vo-lam-idle-db",
+"database_id": "9deef75d-c0dc-49e4-913e-0cf8b704217c",
+"migrations_dir": "migrations"
+}
+]
