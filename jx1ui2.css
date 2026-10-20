@@ -1,0 +1,158 @@
+/* ======== Giao dien JX1 v2: nut / the / tieu de / thanh trang thai cat tu client (Spr\Ui3\道具, 技能, 主界面) ========
+   - The (dtabs): thanh hoa van nhu "Vo cong chieu thuc / Ky nang song" cua bang Vo cong JX1.
+   - Thanh trang thai duoi san dau: khung "新血条面板" voi thanh Sinh luc / Noi luc kieu JX1. */
+:root{--jxtxt:#0d1714;--jxglow:#9fe6d2}
+/* (nut bam: giu kieu jx1ui.css) */
+/* ---- the trong bang (nhu bang Vo cong JX1) ---- */
+.dtabs{gap:0!important;border:1px solid #000;box-shadow:0 0 0 1px #5a5850;background:#000}
+.dtabs button{flex:1;border:0!important;border-radius:0!important;padding:5px 6px!important;margin:0;background:url(ui/jx1/flor.png) center/auto 100% repeat-x!important;
+  color:#e8f6e6!important;font-weight:700;font-size:12px;text-shadow:0 0 2px #000,0 0 2px #000,0 1px 1px #000!important;border-right:1px solid #1d1d1a!important;filter:brightness(.78)}
+.dtabs button:last-child{border-right:0!important}
+.dtabs button.on{filter:none;color:#fff8d8!important;text-shadow:0 0 3px #0b3a30,0 0 2px #000,0 0 1px #000!important;box-shadow:inset 0 -2px 0 #e6c67a}
+/* ---- tieu de muc (h3) trong bang: thanh hoa van nho ---- */
+.tab h3,.mbox h3{background:url(ui/jx1/flor.png) center/auto 100% repeat-x;margin:12px -2px 8px;padding:5px 12px;border:1px solid #000;box-shadow:0 0 0 1px #786438;
+  color:#ffe68a!important;font-family:var(--font-title);font-weight:700;text-shadow:0 1px 2px #000,0 0 8px rgba(255,215,100,0.5);border-bottom:1px solid #000;letter-spacing:0.5px}
+.tab h3 small,.mbox h3 small{color:#cfc6a8;text-shadow:0 1px 2px #000;font-weight:400;font-size:11.5px}
+.mbox h3:first-child{margin-top:0}
+/* ---- o thong tin (card) nhu o "Ngan luong" cua bang Do vat ---- */
+.card,.skl{background:#0b0b0a!important;border:1px solid #000!important;box-shadow:inset 0 0 0 1px #43413b,0 0 0 1px #24231f!important}
+/* ---- thanh trang thai tren cung kieu JX1 (新血条面板): Cap | Sinh luc | Noi luc | Kinh nghiem | Luc chien ---- */
+#hud{position:absolute;top:0!important;left:0!important;right:0!important;bottom:auto!important;transform:none!important;width:auto!important;z-index:5;
+  display:grid!important;grid-template-columns:auto 1fr 1fr 1fr auto!important;gap:0 4px!important;align-items:center;padding:3px 6px!important;
+  background:linear-gradient(180deg,#29251c 0%,#151410 50%,#0d0c0a 100%)!important;border-bottom:2px solid #786438!important;
+  box-shadow:0 2px 8px rgba(0,0,0,0.8),inset 0 1px 0 rgba(255,220,120,0.2)!important;pointer-events:none}
+#hud .jxs{display:flex;align-items:center;gap:3px;font-size:11px;color:#f5e8be;text-shadow:0 1px 2px #000;white-space:nowrap;font-weight:600}
+#hud .jxs b{min-width:24px;padding:0 5px;height:16px;line-height:16px;text-align:center;background:linear-gradient(180deg,#42351d,#1c170d);border:1px solid #947a3e;box-shadow:inset 0 0 0 1px #000;color:#ffe68a;font-size:11px;font-weight:700;border-radius:2px}
+#hud .bar{height:16px!important;border:1px solid #000!important;box-shadow:0 0 0 1px #594b2e,inset 0 1px 3px #000!important;border-radius:2px!important;background:#080807!important;padding:0!important;position:relative}
+#hud .bar i{inset:1px!important;width:0;border-radius:1px}
+#hud .bar.hp i{background:url(ui/jx1/sbar_hp.png) 0 0/100% 100%!important;box-shadow:0 0 5px rgba(220,40,30,0.5)}
+#hud .bar.mp i{background:url(ui/jx1/sbar_mp.png) 0 0/100% 100%!important;box-shadow:0 0 5px rgba(40,100,230,0.5)}
+#hud .bar.xp i{background:url(ui/jx1/sbar_xp.png) 0 0/100% 100%!important;box-shadow:0 0 5px rgba(220,180,40,0.5)}
+#hud .bar span{font-size:9.5px;font-weight:700;line-height:16px;color:#fff;text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;letter-spacing:0.3px}
+#mainSk{display:none}
+#ctrlBtn{top:26px!important}
+#skBuffs{top:54px!important}
+
+/* ---- khung hop thoai: hoa van bac tren + duoi nhu bang Do vat ---- */
+.mbox::before{background:url(ui/jx1/ornt2.png) center bottom/auto 100% no-repeat!important;top:-22px!important;height:30px!important}
+.mbox{box-shadow:0 0 0 1px #000,0 0 0 2px #797369,0 0 0 4px #252320,0 0 0 5px #000,0 0 24px #000!important;background:#252320!important}
+.mbox::after{content:"";position:sticky;display:block;bottom:-14px;height:20px;margin:10px -14px -14px;background:url(ui/jx1/ornb2.png) center top/auto 100% no-repeat;pointer-events:none}
+/* ---- o do: o den vien xam nhu luoi Do vat JX1 ---- */
+.it{background:#020202!important;border:1px solid #3c3a35!important;box-shadow:inset 0 0 0 1px #000,0 0 0 1px #000!important}
+.invgrid{background:#252320!important;border:1px solid #000!important;box-shadow:0 0 0 1px #797369}
+.dktbl{width:100%;border-collapse:collapse;margin:6px 0}.dktbl td,.dktbl th{border:1px solid #3c3a35;padding:3px 6px;text-align:left}.dktbl th{color:#e8dcb0}
+/* ---- Chat the gioi (goc duoi trai san dau, nhu khung chat JX1) ---- */
+#chatBox{position:absolute;left:6px;bottom:8px;width:min(58%,340px);z-index:6;display:flex;flex-direction:column;align-items:flex-start;pointer-events:none;font-size:11.5px}
+#chatHead,#chatIn{display:none}
+#chatLines{width:100%;max-height:86px;overflow:hidden;-webkit-mask-image:linear-gradient(transparent,#000 22px);mask-image:linear-gradient(transparent,#000 22px);display:flex;flex-direction:column;justify-content:flex-end;margin-bottom:4px}
+#chatLines .cl{color:#f2ecd0;text-shadow:0 0 2px #000,0 0 2px #000,0 1px 1px #000;line-height:1.35;word-break:break-word}
+#chatLines .cl i{font-style:normal;color:#9a9480} #chatLines .cl b{color:#ffd76a;font-weight:400} #chatLines .cl small{color:#8fc9b0}
+#chatLines .cl.me b{color:#7fe0ff} #chatLines .cl.sys{color:#a9a39a;font-style:italic}
+#chatBtn{pointer-events:auto;position:relative;width:34px;height:30px;border:1px solid #786438;border-radius:3px;background:linear-gradient(180deg,#383020 0%,#17140b 100%);color:#ffd875;font-size:15px;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.7),inset 0 1px 0 rgba(255,220,120,0.2)}
+#chatBtn b{position:absolute;top:-6px;right:-8px;min-width:16px;padding:0 3px;background:#c0392b;color:#fff;border-radius:8px;font-size:10px;line-height:16px;font-weight:700;box-shadow:0 1px 3px #000}
+#chatBtn b:empty{display:none}
+#chatBox.quiet #chatLines{display:none}
+#chatBox.open{width:min(92%,420px);top:30px;bottom:8px;background:rgba(18,17,14,.95);border:1.5px solid #786438;box-shadow:0 0 0 1px #000, 0 4px 20px rgba(0,0,0,0.9);pointer-events:auto;padding:0;border-radius:4px}
+#chatBox.open #chatHead{display:flex;align-items:center;gap:4px;width:100%;padding:4px 8px;background:url(ui/jx1/flor.png) center/auto 100% repeat-x;border-bottom:1px solid #786438;color:#ffd875;text-shadow:0 1px 2px #000;font-weight:700}
+#chatBox.open #chatHead small{color:#cfc6a8;flex:1;font-weight:400} #chatX{background:none;border:0;font-size:14px;cursor:pointer;color:#ffd875}
+#chatBox.open #chatLines{-webkit-mask-image:none;mask-image:none;flex:1;max-height:none;overflow-y:auto;justify-content:flex-start;padding:6px 8px;margin:0}
+#chatBox.open #chatIn{display:flex;gap:4px;width:100%;padding:4px;border-top:1px solid #4a3e26}
+#chatTxt{flex:1;min-width:0;background:#050505;border:1px solid #5a4b2c;color:#f2ecd0;padding:4px 6px;font:inherit;border-radius:2px}
+#chatBox.open #chatBtn{display:none}
+@media (orientation:landscape){#chatBox{bottom:52px}}
+/* ---- Nut Luyen cong / Nhiem vu goc duoi trai san dau (canh nut chat) ---- */
+#modeSw{position:absolute;left:46px;bottom:8px;z-index:5;display:flex;border:1px solid #786438;border-radius:3px;box-shadow:0 2px 5px rgba(0,0,0,0.7);overflow:hidden}
+#modeSw button{height:30px;padding:0 9px;border:0;background:linear-gradient(180deg,#332c1e,#15130d);color:#e0d5ba;font:inherit;font-size:12px;cursor:pointer;white-space:nowrap;font-weight:600}
+#modeSw{flex-direction:column}#modeSw b{color:#ffe68a;font-weight:700}
+#mswMenu{position:absolute;left:-1px;bottom:31px;display:flex;flex-direction:column;border:1px solid #786438;box-shadow:0 2px 10px rgba(0,0,0,0.9);background:#17140e;border-radius:3px}
+#mswMenu.hidden{display:none}#mswMenu button{text-align:left;min-width:132px}#mswMenu button+button{border-top:1px solid #3d3522}
+#modeSw button.on{background:linear-gradient(180deg,#614e24,#2c220e);color:#fff0b8;box-shadow:inset 0 -2px 0 #f0cf60}
+@media (orientation:landscape){#modeSw{bottom:52px}}
+/* ---- Giang ho online ---- */
+#netBtn{position:relative;flex:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--gold2);background:radial-gradient(#1c2f3a,#06101a);font-size:16px;line-height:30px;padding:0}
+#netBtn.on::after{content:attr(data-n);position:absolute;top:-4px;right:-5px;min-width:15px;height:15px;padding:0 3px;border-radius:8px;background:#e0402a;color:#fff;font-size:10px;line-height:15px;box-shadow:0 0 0 2px #0f1613}
+.nmrow{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #2b2a26}.nmrow>span{flex:1;min-width:0;font-size:12px}
+.nmrow .it{flex:none}.nmg{font-size:22px;width:40px;text-align:center}
+.pfgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}.pfs{display:flex;flex-direction:column;align-items:center;gap:2px}.pfs small{font-size:10px}
+.dktbl a{color:#ffd76a;text-decoration:none}
+#chatBox.open #chatLines .cl b[data-pn]{cursor:pointer;text-decoration:underline dotted}
+.nmrow .it{width:46px;height:46px;flex:none}
+.pfs{width:100%}.pfs .it{width:100%;max-width:62px}
+.ngate h3{text-align:center}.ngate .card .row input{flex:1}
+body.nochat #modeSw{left:6px}
+/* ---- Thanh o vat pham / o vo cong duoi san dau (kieu JX1) ---- */
+#pad{left:50%!important;right:auto!important;bottom:5px!important;transform:translateX(-50%);width:auto!important;flex-wrap:nowrap!important;gap:0!important;align-items:center;
+  padding:4px 6px;background:linear-gradient(180deg,#2b261e 0%,#14130f 100%);border:1.5px solid #856f3e;box-shadow:0 0 0 1px #000,0 4px 14px rgba(0,0,0,0.85),inset 0 1px 0 rgba(255,220,120,0.25);border-radius:4px;pointer-events:auto!important}
+#pad .hb{display:flex;gap:3px;align-items:center}
+#pad .hb+.hb{margin-left:6px;padding-left:6px;border-left:1px solid #000;box-shadow:-1px 0 0 #574828}
+#pad .pbtn{width:36px;height:36px;margin:0!important;border-radius:3px!important;border:1px solid #5a4b2c!important;background:radial-gradient(circle at 40% 40%,#1f1d17,#080806)!important;box-shadow:inset 0 0 0 1px #000,0 1px 3px rgba(0,0,0,0.7)!important;overflow:hidden;transition:transform .1s,border-color .15s}
+#pad .pbtn:active{transform:scale(0.95)}
+#pad .pbtn i{inset:2px;background:center/contain no-repeat}
+#pad .pbtn.sk i{background-size:cover}
+#pad .pbtn b{left:2px;right:auto;bottom:0;font:700 9.5px/1 var(--font);color:#ffd875;text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;z-index:2}
+#pad .pbtn em{position:absolute;right:2px;bottom:1px;font:700 9.5px/1 var(--font);font-style:normal;color:#72f588;text-shadow:0 1px 2px #000;z-index:2}
+#pad .pbtn .cd{z-index:1}
+#pad .pbtn.tp i{background-image:url(img/ep/ldp.png)}
+#pad .pbtn.empty{opacity:1;border-style:solid!important} #pad .pbtn.empty i{opacity:0}
+#pad .pbtn.cur{border-color:#f5d061!important;box-shadow:inset 0 0 0 1px #000,0 0 8px rgba(245,208,97,0.8)!important}
+#pad .pbtn.mn{width:44px;height:44px;border:2px solid #e5c158!important;box-shadow:0 0 0 1px #000,0 0 10px rgba(229,193,88,0.5),inset 0 0 0 1px #000!important;cursor:pointer}
+#pad .pbtn.mn i{background-size:cover}
+#pad .sk .sklv{z-index:2}
+#pad .pbtn:hover{border-color:#caa85a!important}
+#chatBox,#modeSw{bottom:54px!important}
+@media (max-width:440px){#pad .pbtn{width:32px;height:32px}#pad .pbtn.mn{width:40px;height:40px}}
+/* ---- Auto: o tick ---- */
+#ctrlBtn,#rotBtn{display:flex;align-items:center;gap:5px}
+#ctrlBtn .ck,#rotBtn .ck{display:inline-block;width:12px;height:12px;border:1px solid #9a8a5a;background:#050505;box-shadow:inset 0 0 0 1px #000;position:relative}
+#ctrlBtn.on .ck::after,#rotBtn.on .ck::after{content:"";position:absolute;left:3px;top:0;width:4px;height:8px;border:solid #7fe07a;border-width:0 2px 2px 0;transform:rotate(45deg)}
+#ctrlBtn:not(.on),#rotBtn:not(.on){color:#a9a39a!important;background:linear-gradient(#26262a,#121214)!important;border-color:#55524a!important}
+#pad .pbtn .pk{position:absolute;right:0;top:0;width:13px;height:12px;font:9px/12px sans-serif;text-decoration:none;color:#e8dcb0;background:#000a;z-index:3;text-align:center;cursor:pointer}
+/* ---- Bo loc: che do thong minh ---- */
+.lootf.smart .lc{display:none!important}
+.lmode{margin-bottom:6px}
+.it u.up{position:absolute;left:2px;top:1px;color:#7fe07a;font:700 11px/1 sans-serif;text-decoration:none;text-shadow:0 0 2px #000,0 0 2px #000}
+.it u.up.pot{color:#ffd24a}
+/* ---- vien o do theo do hiem (JX1): xanh / hiem / tim / Hoang Kim / Bach Kim ---- */
+.it.r1{border-color:#38bdf8!important;box-shadow:inset 0 0 0 1px #000,inset 0 0 8px rgba(56,189,248,0.4),0 0 4px rgba(56,189,248,0.3)!important}
+.it.r2{border-color:#a855f7!important;box-shadow:inset 0 0 0 1px #000,inset 0 0 8px rgba(168,85,247,0.45),0 0 5px rgba(168,85,247,0.35)!important}
+.it.r3{border-color:#ec4899!important;box-shadow:inset 0 0 0 1px #000,inset 0 0 10px rgba(236,72,153,0.5),0 0 6px rgba(236,72,153,0.4)!important}
+.it.r4{border-color:#facc15!important;box-shadow:inset 0 0 0 1px #000,inset 0 0 10px rgba(250,204,21,0.6),0 0 8px rgba(250,204,21,0.6)!important;animation:hkGlow 2.4s ease-in-out infinite alternate}
+.it.r5{border-color:#22d3ee!important;box-shadow:inset 0 0 0 1px #000,inset 0 0 12px rgba(34,211,238,0.7),0 0 10px rgba(34,211,238,0.7)!important;animation:bkGlow 2s ease-in-out infinite alternate}
+@keyframes hkGlow{0%{box-shadow:inset 0 0 0 1px #000,inset 0 0 7px rgba(250,204,21,0.4),0 0 5px rgba(250,204,21,0.4)}100%{box-shadow:inset 0 0 0 1px #000,inset 0 0 14px rgba(250,204,21,0.8),0 0 12px rgba(250,204,21,0.8)}}
+@keyframes bkGlow{0%{box-shadow:inset 0 0 0 1px #000,inset 0 0 8px rgba(34,211,238,0.5),0 0 6px rgba(34,211,238,0.5)}100%{box-shadow:inset 0 0 0 1px #000,inset 0 0 16px rgba(34,211,238,0.9),0 0 14px rgba(34,211,238,0.9)}}
+.warnc{border-color:#a33!important;background:#2a1010cc}
+
+/* Xoay chiêu: cạnh nút Auto (góc trên phải, ngoài vùng đánh), không che nhân vật / quái */
+#topCtl{position:absolute;right:8px;top:26px;z-index:4;display:flex;gap:6px;align-items:center}
+#topCtl .chip{position:static!important;top:auto!important;right:auto!important;left:auto!important;bottom:auto!important}
+
+/* Bang chon chieu o F1-F4 (kieu JX1) */
+#skPick{position:absolute;z-index:30;display:grid;grid-template-columns:repeat(6,36px);gap:3px;padding:6px;background:linear-gradient(#1c1d19,#0b0c0a);border:1px solid #6b5a2e;box-shadow:0 0 0 1px #000,0 6px 14px #000c}
+#skPick .nm{grid-column:1/-1;font-size:11px;color:#e8dcc0;padding:0 2px 4px;border-bottom:1px solid #2e2b22;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#skPick .nm small{color:#a99f86}
+#skPick .spk{width:36px;height:36px;padding:0;border:1px solid #3d3a30;background:#000 center/cover no-repeat;position:relative;cursor:pointer;box-shadow:inset 0 0 0 1px #000}
+#skPick .spk:hover{border-color:#c9a85a}
+#skPick .spk.on{border-color:#ffd24a;box-shadow:0 0 0 1px #ffd24a,0 0 8px #ffd24a88}
+#skPick .spk u{position:absolute;right:1px;bottom:0;font:10px var(--font);color:#fff;text-decoration:none;text-shadow:0 0 2px #000,0 0 2px #000}
+#skPick .spk i{position:absolute;left:1px;top:0;font:9px var(--font);font-style:normal;color:#ffd24a;text-shadow:0 0 2px #000,0 0 2px #000}
+
+#pad .sk.nowp i{filter:grayscale(1) brightness(.55)}
+
+#ktcBtn{position:static;flex:none;margin:0 6px 0 0;padding:3px 9px;font-size:12px;white-space:nowrap;width:auto;height:auto;border-radius:3px;background:linear-gradient(#3a3020,#201a10);border:1px solid #8a6d35;color:#ffd98a;cursor:pointer}
+.gold .knbi{width:16px;height:16px;margin-left:8px;image-rendering:pixelated}
+#knbTop{color:#ffd24a}
+@media (max-width:520px){#ktcBtn{font-size:11px;padding:2px 5px}}
+#chatAtt:empty{display:none}#chatAtt{display:flex;align-items:center;gap:2px;max-width:45%;white-space:nowrap;overflow:hidden;font-size:11px;pointer-events:auto}
+#chatAtt button{border:0;background:none;color:#f88;cursor:pointer;padding:0 3px}
+#chatLines a.chit{cursor:pointer;text-decoration:underline dotted;pointer-events:auto}
+#chatLines .cl.pend{opacity:.6}
+
+#skPick .spk0{color:#ff6a5a;font:bold 18px/34px serif;background:#2a1210}
+/* v376: dien thoai man doc hep: nut Ky Tran Cac thanh nut tron (hinh KNB) nhu cac nut ben phai, khong de len ten / ban do */
+@media (max-width:520px){
+  #ktcBtn{position:relative!important;flex:none;width:34px!important;height:34px!important;min-height:0!important;padding:0!important;margin:0!important;border-radius:50%!important;font-size:0!important;color:transparent!important;
+    background:url(img/ep/knb.png) center/20px no-repeat,radial-gradient(#3a2f1c,#120d06)!important;border:1px solid var(--gold2)!important}
+  #top .topmid{overflow:hidden}
+  #top .topmid .row{flex-wrap:wrap;gap:0 6px}
+  #top .topmid .row>*{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}

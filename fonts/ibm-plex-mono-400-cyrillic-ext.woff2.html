@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0e1412">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="https://volamidle.pages.dev/fonts/manifest.json">
+<title>Võ Lâm Idle</title>
+<link rel="stylesheet" href="https://volamidle.pages.dev/fonts/fonts/ibm-plex-mono.css">
+<link rel="stylesheet" href="https://volamidle.pages.dev/fonts/style.css?v=397">
+<link rel="stylesheet" href="https://volamidle.pages.dev/fonts/jx1ui.css?v=397">
+<link rel="stylesheet" href="https://volamidle.pages.dev/fonts/jx1ui2.css?v=397">
+<link rel="stylesheet" href="https://volamidle.pages.dev/fonts/ui20.css?v=397">
+</head>
+<body>
+<div id="app">
+  <header id="top">
+    <div class="lvbox"><span id="lv">1</span></div>
+    <div class="topmid">
+      <div class="row"><b id="heroName">Võ Lâm Idle</b><span id="stageLbl"></span></div>
+    </div>
+    <button id="ktcBtn" title="Kỳ Trân Các">Kỳ Trân Các</button>
+    <div class="gold"><span class="coin"></span><span id="gold">0</span><img class="knbi" src="https://volamidle.pages.dev/fonts/img/ep/knb.png" alt=""><span id="knbTop">0</span></div>
+    <button id="actBtn" title="Nhiệm vụ · Hoạt động">⚔</button>
+    <button id="giftBtn" title="Phần thưởng">🎁</button>
+    <button id="compactBtn" title="Thu gọn / mở rộng sân đấu">⛶</button>
+  </header>
+
+  <section id="battle">
+    <div id="bg"></div>
+    <canvas id="arena"></canvas>
+    <div id="hud">
+      <div class="jxs"><span>Cấp</span><b id="lvS">1</b></div>
+      <div class="bar hp"><i id="hpBar"></i><span id="hpTxt"></span></div>
+      <div class="bar mp"><i id="mpBar"></i><span id="mpTxt"></span></div>
+      <div class="bar xp"><i id="xpBar"></i><span id="xpTxt"></span></div>
+      <div class="jxs" title="Lực tay phải (sát thương chiêu chính)"><span>Lực tay</span><b id="pwS">0</b></div>
+      <div id="mainSk"></div>
+    </div>
+    <div id="topCtl"><button id="rideBtn" class="chip"></button><button id="rotBtn" class="chip"></button><button id="ctrlBtn" class="chip"></button></div>
+    <button id="inBtn" class="chip"></button>
+    <div id="townBar" class="hidden"><b id="townName"></b><button class="btn sm" id="bShop">Cửa hàng</button><button class="btn sm" id="bKtcT">Kỳ Trân Các</button><button class="btn sm" id="bStashT">Kho chung</button><button class="btn sm" id="bSellTown">Bán đồ không khớp lọc</button><button class="btn sm on" id="bBack">Trở lại bãi</button></div>
+    <div id="pad">
+      <div class="hb">
+        <button class="pbtn pot hp" id="bHp" title="Thuốc sinh lực (phím 1)"><i></i><div class="cd"></div><em></em><b>1</b><s class="pk">▾</s></button>
+        <button class="pbtn pot mp" id="bMp" title="Thuốc nội lực (phím 2)"><i></i><div class="cd"></div><em></em><b>2</b><s class="pk">▾</s></button>
+        <button class="pbtn pot tp" id="bTp" title="Thổ Địa Phù (phím 3)"><i></i><div class="cd"></div><b>3</b></button>
+      </div>
+      <div class="hb"><button class="pbtn mn" id="bMain"><i></i></button></div>
+      <div class="hb">
+        <button class="pbtn sk" data-i="0" title=""><i></i><b>F1</b><s class="pk">▾</s></button>
+        <button class="pbtn sk" data-i="1" title=""><i></i><b>F2</b><s class="pk">▾</s></button>
+        <button class="pbtn sk" data-i="2" title=""><i></i><b>F3</b><s class="pk">▾</s></button>
+        <button class="pbtn sk" data-i="3" title=""><i></i><b>F4</b><s class="pk">▾</s></button>
+      </div>
+    </div>
+  </section>
+
+  <main id="panel">
+    <div class="tab" id="t-log"></div>
+    <div class="tab hidden" id="t-char"></div>
+    <div class="tab hidden" id="t-skill"></div>
+    <div class="tab hidden" id="t-inv"></div>
+    <div class="tab hidden" id="t-forge"></div>
+    <div class="tab hidden" id="t-quest"></div>
+    <div class="tab hidden" id="t-more"></div>
+  </main>
+
+  <nav id="tabs">
+    <button data-t="log" class="on">Giang hồ</button>
+    <button data-t="char">Nhân vật<em class="dot" id="dotChar"></em></button>
+    <button data-t="inv">Hành trang</button>
+    <button data-t="skill">Võ công<em class="dot" id="dotSkill"></em></button>
+    <button data-t="forge">Lò rèn<em class="dot" id="dotForge"></em></button>
+    <button data-t="quest">Nhiệm vụ<em class="dot" id="dotQuest"></em></button>
+    <button id="tabRide" class="tride">Ngựa</button>
+    <button data-t="more">Hệ thống</button>
+  </nav>
+
+  <div id="modal" class="hidden" role="dialog" aria-modal="true"><div class="mbox" tabindex="-1"><button class="mx" id="mClose">✕</button><div id="mBody"></div></div></div>
+  <div id="toast" role="status" aria-live="polite"></div>
+</div>
+<script src="https://volamidle.pages.dev/fonts/data.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/setvi.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/setfix.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/world.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/zones2.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/sound.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/fx.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/jmo.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/jmo2.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/core.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/mapobs.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/stats.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/vocong.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/skillsys.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/kytran.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/loot.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/rdata.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/sets.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/recipes.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/combat.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/field.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/ride.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/save.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/guard.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/render.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/jxmis.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/jxstate.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/fx2.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/fx3.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/skillfx.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/look.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/jxparts.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/audio.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/ui.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/control.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/shop.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/potsel.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/rewards.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/title.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/records.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/horse.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/thanma.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/dungeon.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/giangho.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/forge.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/epdo.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/thuyen.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/mode.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/tabs2.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/auto.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/guide.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/stash.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/donkho.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/name.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/chatcfg.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/chat.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/net.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/ui20.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/ui20win.js?v=397"></script>
+<script src="https://volamidle.pages.dev/fonts/js/main.js?v=397"></script>
+</body>
+</html>

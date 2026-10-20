@@ -1,0 +1,193 @@
+/* ======== Giao dien JX1 (anh cat tu client JX1: Spr\Ui3) ======== */
+:root{--panel:#141413;--panel2:#1b1b19;--line:#33332e;--line2:#4d5a4f;--gold:#f0d890;--gold2:#7b6d48;--jade:#7fb8a4;--text:#e8e2cc}
+#app{background:#0b0b0a}
+/* thanh tren: nhu thanh trang thai JX1 */
+#top{
+  background:linear-gradient(180deg,#2b251b 0%,#181611 60%,#0d0c0a 100%)!important;
+  border-bottom:2px solid #856a36!important;
+  box-shadow:0 2px 10px rgba(0,0,0,0.8),inset 0 1px 0 rgba(255,220,120,0.2)!important;
+  padding:calc(6px + var(--safe-t)) 10px 6px!important;
+}
+.lvbox{
+  width:46px!important;height:46px!important;
+  border-radius:4px!important;
+  border:2px solid #9c7e3f!important;
+  box-shadow:0 0 0 1px #000,inset 0 0 0 1px #000,inset 0 0 10px rgba(0,0,0,0.8),0 2px 6px rgba(0,0,0,0.6)!important;
+  background-color:#141310!important;
+}
+.lvbox #lv{
+  border-radius:4px!important;
+  border:1.5px solid #ffd875!important;
+  background:linear-gradient(180deg,#991e12,#5a0e08)!important;
+  color:#fff!important;
+  box-shadow:0 2px 4px #000,inset 0 1px 0 rgba(255,255,255,0.3)!important;
+  font-weight:700!important;
+  font-size:11px!important;
+}
+#heroName{
+  font-family:var(--font-title);
+  font-weight:700;
+  font-size:14.5px;
+  color:#ffd875;
+  text-shadow:0 1px 2px #000,0 0 8px rgba(243,211,91,0.4);
+}
+#stageLbl{
+  background:rgba(0,0,0,0.55);
+  border:1px solid #5a4b2b;
+  border-radius:3px;
+  padding:1px 7px;
+  color:#e6dac0;
+  font-size:11px;
+  font-weight:500;
+  text-shadow:0 1px 2px #000;
+}
+.gold{
+  background:rgba(12,11,9,0.85);
+  border:1px solid #786438;
+  border-radius:12px;
+  padding:2px 8px;
+  box-shadow:inset 0 1px 3px #000,0 1px 2px rgba(0,0,0,0.5);
+}
+#gold{
+  color:#ffd875;
+  font-weight:700;
+  font-size:12.5px;
+  text-shadow:0 1px 2px #000;
+  font-variant-numeric:tabular-nums;
+}
+#knbTop{
+  color:#ffe68a;
+  font-weight:700;
+  font-size:12.5px;
+  text-shadow:0 0 6px rgba(255,215,100,0.4);
+  font-variant-numeric:tabular-nums;
+}
+#actBtn,#giftBtn,#compactBtn{
+  border-radius:50%!important;
+  border:1.5px solid #9c7e3f!important;
+  background:radial-gradient(circle at 40% 35%,#3d3420,#17140b)!important;
+  color:#ffd875!important;
+  box-shadow:0 2px 5px rgba(0,0,0,0.7),inset 0 1px 0 rgba(255,220,120,0.2)!important;
+}
+.bar{border-radius:0;border:1px solid #000;box-shadow:0 0 0 1px #3d4a3f;background:#050505;height:11px}
+.bar.hp i{background:url(ui/jx1/bar_hp.png) 0 0/100% 100%} .bar.mp i{background:url(ui/jx1/bar_mp.png) 0 0/100% 100%}
+.bar.xp i{background:url(ui/jx1/bar_xp.png) 0 0/100% 100%}
+#hud .bar{border-image:none}
+/* khung bang: tieu de ngoc + hoa van bac */
+#panel{background:#121211;border-top:0;position:relative}
+#panel::before{content:"";display:block;height:26px;background:url(ui/jx1/ornb.png) center top/auto 100% no-repeat,linear-gradient(#2a221a,#0d0c0a);border-bottom:1px solid #000}
+.tab{padding:0 8px 16px}
+.tab::before{
+  display:block;position:sticky;top:0;z-index:2;height:38px;line-height:38px;margin:0 -8px 8px;text-align:center;
+  font-family:var(--font-title);font-size:15px;font-weight:700;letter-spacing:3px;
+  color:#ffe68a;text-shadow:0 1px 2px #000,0 0 8px rgba(255,215,100,0.5);
+  background:url(ui/jx1/tl.png) left center/auto 100% no-repeat,url(ui/jx1/tr.png) right center/auto 100% no-repeat,url(ui/jx1/tm.png) center/auto 100% repeat-x;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+}
+#t-log::before{content:"GIANG HỒ"} #t-char::before{content:"NHÂN VẬT"} #t-skill::before{content:"VÕ CÔNG"} #t-inv::before{content:"HÀNH TRANG"} #t-more::before{content:"HỆ THỐNG"} #t-forge::before{content:"LÒ RÈN"} #t-quest::before{content:"NHIỆM VỤ"}
+h3{color:var(--gold);border-bottom:1px solid #3a3a33;padding-bottom:3px}
+.card,.skl{border-radius:4px;background:#161614;border:1px solid #000;box-shadow:inset 0 0 0 1px #4d4432, 0 1px 4px rgba(0,0,0,0.5)}
+/* nut ngoc xanh nhu "Moi vao doi" */
+.btn,.chip,.dtabs button{
+  border-radius:3px!important;
+  background:linear-gradient(180deg,#2b3d32 0%,#15241b 100%)!important;
+  border:1px solid #5a7d6b!important;
+  color:#f5f0db!important;
+  font-weight:600;
+  box-shadow:0 1px 3px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.15)!important;
+  text-shadow:0 1px 2px #000;
+  transition:filter .1s,transform .08s;
+}
+.btn:hover,.chip:hover,.dtabs button:hover{filter:brightness(1.15)}
+.btn:active,.chip:active,.dtabs button:active{transform:translateY(1px);filter:brightness(0.95)}
+.btn.on,.chip.on,.dtabs button.on{
+  background:linear-gradient(180deg,#5e4c22 0%,#2c220e 100%)!important;
+  border-color:#f0cf60!important;
+  color:#fff0b8!important;
+  box-shadow:0 1px 3px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,230,140,0.3),0 0 8px rgba(240,207,96,0.35)!important;
+}
+.btn.red{
+  background:linear-gradient(180deg,#69221a 0%,#350f0b 100%)!important;
+  border-color:#b54e40!important;
+  color:#ffe8e4!important;
+  box-shadow:0 1px 3px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,200,190,0.2)!important;
+}
+/* o do / o trang bi: luoi den nhu Ruong / Hanh trang JX1 */
+.it,.slot{border-radius:3px;background:radial-gradient(circle at 40% 40%,#1c1a15,#070706);border:1px solid #4a4332;box-shadow:inset 0 0 0 1px #000, 0 1px 3px rgba(0,0,0,0.6)}
+.slot{border-style:solid;color:#786e58;font-weight:500}
+.invgrid{gap:2px;background:#141310;padding:4px;border:1.5px solid #6b5a32;border-radius:4px;box-shadow:inset 0 0 8px #000, 0 2px 8px rgba(0,0,0,0.7)}
+.eqgrid{background:url(ui/jx1/pbg.png) center/contain no-repeat,#0e0d0b;padding:8px;border:1.5px solid #6b5a32;border-radius:4px;box-shadow:inset 0 0 12px #000, 0 2px 8px rgba(0,0,0,0.7)}
+/* thanh nut duoi: bieu tuong goc JX1 (8 the) */
+#tabs{
+  display:grid!important;
+  grid-template-columns:repeat(8,1fr)!important;
+  background:linear-gradient(180deg,#2c271e 0%,#171510 50%,#0d0c0a 100%)!important;
+  border-top:2px solid #856f3e!important;
+  box-shadow:0 -2px 10px rgba(0,0,0,0.8),inset 0 1px 0 rgba(255,220,120,0.2)!important;
+  padding-bottom:var(--safe-b);
+}
+#tabs button{
+  position:relative;
+  color:#c4b998;
+  font-size:10px!important;
+  font-weight:600;
+  letter-spacing:-.3px;
+  white-space:nowrap;
+  overflow:hidden;
+  padding:32px 0 5px!important;
+  text-shadow:0 1px 2px #000;
+  transition:color .15s,background .15s;
+}
+#tabs button::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:4px;
+  width:22px;
+  height:22px;
+  margin-left:-11px;
+  background-size:66px 22px!important;
+  background-position:0 0!important;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,0.8));
+}
+#tabs button:hover::before{
+  background-position:-22px 0!important;
+}
+#tabs button.on{
+  color:#ffe68a!important;
+  text-shadow:0 0 6px rgba(255,215,100,0.6),0 1px 2px #000!important;
+  background:radial-gradient(ellipse at 50% 30%,rgba(180,140,50,0.35),transparent 70%)!important;
+}
+#tabs button.on::before{
+  background-position:-44px 0!important;
+}
+#tabs button[data-t=log]::before{background-image:url(img/u2/map.png)!important}
+#tabs button[data-t=char]::before{background-image:url(img/u2/char.png)!important}
+#tabs button[data-t=inv]::before{background-image:url(img/u2/inv.png)!important}
+#tabs button[data-t=skill]::before{background-image:url(img/u2/skill.png)!important}
+#tabs button[data-t=forge]::before{background-image:url(img/u2/forge.png)!important}
+#tabs button[data-t=quest]::before{background-image:url(img/u2/quest.png)!important}
+#tabs button#tabRide::before,#tabs button.tride::before{background-image:url(img/u2/ride.png)!important}
+#tabs button[data-t=more]::before{background-image:url(img/u2/more.png)!important}
+#tabs .dot{
+  position:absolute;
+  top:3px;
+  right:16%;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:radial-gradient(circle,#ff4d4d,#b30000);
+  border:1px solid #ffd875;
+  box-shadow:0 0 6px #ff2222;
+  display:none;
+}
+#tabs .dot.on{display:block}
+/* hop thoai */
+.mbox{border-radius:0;border:0!important;border-image:none!important;background:#141413;box-shadow:0 0 0 1px #000,0 0 0 3px #4a463a,0 0 24px #000;padding-top:30px}
+.mbox::before{content:"";position:absolute;left:0;right:0;top:-14px;height:24px;background:url(ui/jx1/ornt.png) center/auto 100% no-repeat}
+#t-forge::before{content:"LÒ RÈN"} #t-quest::before{content:"NHIỆM VỤ"}
+.fcard{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:start}
+.fcard .fic{width:44px;height:44px;display:grid;place-items:center;background:#0a0a0a;border:1px solid #2e2e2a}
+.fcard .fic img{height:30px;image-rendering:pixelated}
+.it .fenh{left:auto;right:2px;top:0;color:#ffe9a8}
+.modec .modesw{display:flex;gap:6px;margin-bottom:6px}.modec .modesw .btn{flex:1}

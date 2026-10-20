@@ -1,0 +1,315 @@
+:root{
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Tahoma,Arial,sans-serif;
+  --font-title:"Cinzel","Times New Roman","Palatino",serif;
+  --font-mono:ui-monospace,Menlo,Monaco,Consolas,monospace;
+  --bg:#0b0c0b; --panel:#131413; --panel2:#1a1b19; --line:#35332c; --line2:#4d493e;
+  --gold:#f3d35b; --gold2:#8f753c; --gold-border:#6d5b32; --text:#ede7d5; --dim:#9e9786;
+  --red:#c8321f; --hp:#b8322a; --mp:#2f64b8; --xp:#c9a23a;
+  --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#050807;color:var(--text);font:14px/1.4 var(--font);overflow:hidden;user-select:none;-webkit-user-select:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button[disabled]{opacity:.4;cursor:default}
+.hidden{display:none!important}
+.dim{color:var(--dim)} .small{font-size:12px}
+#app{position:relative;height:100dvh;width:min(100vw,calc(100dvh*9/16));margin:0 auto;background:var(--bg);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 0 40px #000}
+
+#top{display:flex;align-items:center;gap:8px;padding:calc(6px + var(--safe-t)) 10px 6px;background:linear-gradient(#1a2521,#0f1613);border-bottom:1px solid var(--gold2);z-index:3}
+.lvbox{position:relative;width:46px;height:46px;border-radius:8px;border:2px solid var(--gold2);background:var(--pl, none) center 12%/auto 135% no-repeat,radial-gradient(#2c3a2f,#0c120f);image-rendering:pixelated;flex:none;overflow:visible}
+.lvbox #lv{position:absolute;right:-6px;bottom:-6px;min-width:22px;height:22px;padding:0 4px;border-radius:11px;border:2px solid var(--gold2);background:#0c120f;display:grid;place-items:center;font-weight:700;color:var(--gold);font-size:12px}
+.topmid{flex:1;min-width:0}
+.topmid .row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+.topmid b{color:var(--gold);font-family:var(--font)}
+#stageLbl{color:var(--dim)}
+.gold{display:flex;align-items:center;gap:5px;font-weight:600;color:var(--gold);font-size:13px}
+.coin{width:14px;height:10px;border-radius:50% 50% 45% 45%;background:radial-gradient(circle at 40% 35%,#fbe9ad,#a7792b);box-shadow:0 0 0 1px #5a3d14}
+.bar{position:relative;height:12px;background:#060908;border:1px solid var(--line2);border-radius:3px;overflow:hidden}
+.bar i{position:absolute;inset:0;width:0;transition:width .15s linear}
+.bar span{position:absolute;inset:0;font-size:9.5px;line-height:11px;text-align:center;color:#fff;text-shadow:0 0 2px #000,0 0 2px #000}
+.bar.xp i{background:linear-gradient(#e0bd55,#8f6a1c)} .bar.hp i{background:linear-gradient(#e0503f,#7d1a12)} .bar.mp i{background:linear-gradient(#5a8fe6,#1d3f80)}
+
+#battle{position:relative;flex:0 0 46%;overflow:hidden;background:#1a211b}
+#bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:saturate(.85) brightness(.8);transition:background-image .6s}
+#battle::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;background:radial-gradient(ellipse at 50% 55%,transparent 45%,#0009 100%)}
+#arena{position:absolute;inset:0;width:100%;height:100%}
+.enh{color:#7fe3ff;font-size:.85em;text-shadow:0 0 4px #2aa8ff}
+/* phan thuong (rewards.js) */
+#giftBtn{position:relative;flex:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--gold2);background:radial-gradient(#3a2f1c,#120d06);font-size:16px;line-height:30px}
+#giftBtn.on::after{content:"";position:absolute;top:0;right:0;width:9px;height:9px;border-radius:50%;background:#e0402a;box-shadow:0 0 0 2px #0f1613;animation:gpulse 1.2s infinite}
+@keyframes gpulse{50%{transform:scale(1.3)}}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:8px 0}
+.day{padding:6px 3px;border:1px solid var(--line);border-radius:6px;background:var(--panel2);text-align:center;font-size:11px}
+.day b{display:block;color:var(--gold);font-size:11px} .day small{display:block;color:var(--dim);font-size:9.5px;line-height:1.2}
+.day.cur{border-color:var(--gold);box-shadow:0 0 6px #e6c67a55} .day.got{opacity:.5} .day.got b::after{content:" ✓"}
+.qrow{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:6px 8px;margin:4px 0;border:1px solid var(--line);border-radius:6px;background:var(--panel2)}
+.qrow small{color:var(--dim);font-size:11px} .qrow span small{display:block} .qrow.lock{opacity:.5}
+.petpick{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-height:40vh;overflow:auto}
+.petpick button{padding:4px;border:1px solid var(--line);border-radius:6px;background:var(--panel2);font-size:10px}
+.petpick button.on{border-color:var(--gold)} .petpick img{display:block;width:100%;height:44px;object-fit:contain} .petpick b{display:block;font-weight:500}
+#hud{position:absolute;left:8px;right:8px;top:6px;display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;pointer-events:none}
+#mainSk{grid-column:1/3;font-size:11px;color:var(--gold);text-shadow:0 0 3px #000}
+
+#panel{flex:1;min-height:0;overflow:hidden;background:var(--panel);border-top:1px solid var(--gold2)}
+.tab{height:100%;overflow-y:auto;padding:10px 10px 16px}
+h3{font:400 14px var(--font);color:var(--gold);margin:12px 0 6px;display:flex;justify-content:space-between;align-items:baseline}
+h3 small{font:12px var(--font);color:var(--dim)}
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin-bottom:8px}
+.row{display:flex;gap:6px;align-items:center}
+.btn{background:linear-gradient(#34483f,#1f2c27);border:1px solid var(--line2);border-radius:5px;padding:7px 12px;color:var(--text)}
+.btn:active{transform:translateY(1px)} .btn.sm{padding:4px 10px;font-size:12px} .btn.on{border-color:var(--gold);color:var(--gold)}
+.btn.red{background:linear-gradient(#5a2a22,#34160f)}
+.btnrow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap} .btnrow .btn{flex:1}
+.sp{flex:1}
+.boss{color:#ff9a5a} .up{color:#9fe36a} .bad{color:#ff7b62}
+.stagectl{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.log{max-height:150px;overflow:auto;font-size:12px;background:#0b100e;border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+.log div{padding:1px 0;border-bottom:1px solid #16201c}
+.zlist{display:grid;gap:4px}
+.zrow{display:flex;justify-content:space-between;padding:8px 10px;border:1px solid var(--line);border-radius:5px;background:var(--panel2);text-align:left}
+.zrow span{color:var(--dim);font-size:12px} .zrow.cur{border-color:var(--gold);box-shadow:inset 3px 0 0 var(--gold)} .zrow.lock b{color:var(--dim)}
+
+.eqgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}
+.slot{aspect-ratio:1;border:1px dashed var(--line2);border-radius:6px;display:grid;place-items:center;font-size:11px;color:var(--dim);text-align:center}
+.attr{display:grid;grid-template-columns:1fr auto 64px;align-items:center;gap:8px;padding:3px 0}
+.attr b{color:var(--gold)}
+.plus{width:28px;height:26px;border-radius:5px;border:1px solid var(--gold2);color:var(--gold);font-weight:700;background:#26332d}
+.stats{display:grid;grid-template-columns:1fr auto;gap:3px 10px;font-size:13px}
+.stats span:nth-child(even){color:var(--gold);text-align:right}
+
+.invbar{display:flex;gap:6px;align-items:center;margin-bottom:8px;font-size:12px}
+select,textarea{background:#0b100e;color:var(--text);border:1px solid var(--line2);border-radius:5px;padding:4px;font:12px var(--font);width:100%}
+.invbar select{width:auto}
+.invgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.it{position:relative;aspect-ratio:1;width:100%;border:1px solid var(--line2);border-radius:5px;background:#0c1210;display:grid;place-items:center;overflow:hidden}
+.it img{max-width:88%;max-height:88%;image-rendering:auto}
+.it i{position:absolute;right:2px;bottom:0;font:10px var(--font);color:var(--dim)}
+.it em{position:absolute;left:2px;top:0;font:400 11px var(--font);color:#7f7}
+.it.r1{border-color:#6aa8ff;box-shadow:inset 0 0 8px #3a6ab8} .it.r2{border-color:#ffd24a;box-shadow:inset 0 0 8px #a88420} .it.r3{border-color:#c77bff;box-shadow:inset 0 0 10px #7a3ab0}
+.it.bad{filter:grayscale(.8)} .it.bad i{color:#f66}
+
+.skl{display:grid;grid-template-columns:40px 1fr auto auto;gap:8px;align-items:center;padding:6px;border:1px solid var(--line);border-radius:6px;background:var(--panel2);margin-bottom:5px}
+.skl.lock{opacity:.5} .skl.main{border-color:var(--gold);box-shadow:inset 3px 0 0 var(--gold)}
+.skl .sic{width:40px;height:40px;border-radius:5px;border:1px solid var(--line2)}
+.skl .info small{display:block;color:var(--dim);font-size:11px}
+.skl .lvl{color:var(--gold);font-size:12px}
+.tag{font-size:10px;padding:1px 5px;border-radius:3px;background:#2a3a33;color:var(--dim)} .tag.attack{background:#4a2a1f;color:#ffb38a}
+
+#tabs{display:grid;grid-template-columns:repeat(5,1fr);background:#0b100e;border-top:1px solid var(--gold2);padding-bottom:var(--safe-b)}
+#tabs button{position:relative;padding:10px 2px;font-size:12px;color:var(--dim)} #tabs button.on{color:var(--gold);box-shadow:inset 0 2px 0 var(--gold)}
+.dot{position:absolute;top:6px;right:12%;width:7px;height:7px;border-radius:50%;background:#f55;display:none} .dot.on{display:block}
+
+#modal{position:absolute;inset:0;background:#000b;display:grid;place-items:center;z-index:10;padding:12px}
+.mbox{position:relative;width:100%;max-height:92%;overflow:auto;background:var(--panel);border:1px solid var(--gold2);border-radius:8px;padding:14px}
+.mx{position:absolute;right:8px;top:6px;color:var(--dim);font-size:16px}
+.desc{color:var(--dim);font-size:13px;margin:4px 0 8px}
+.idet{display:flex;gap:12px;align-items:center;padding-bottom:8px;border-bottom:1px solid #4a3e26;margin-bottom:8px}
+.idet .pic{width:58px;height:58px;border:1.5px solid #6d5b32;box-shadow:inset 0 0 0 1px #000, 0 2px 6px rgba(0,0,0,0.8);border-radius:4px;display:grid;place-items:center;background:radial-gradient(circle at 40% 40%,#1c1a14,#080806);flex-shrink:0}
+.idet .pic img{max-width:92%;max-height:92%;image-rendering:pixelated}
+.idet h4{font-family:var(--font-title);font-weight:700;font-size:16px;letter-spacing:0.5px;margin-bottom:3px;text-shadow:0 1px 2px #000}
+.sl{margin:8px 0;font-size:12.5px;line-height:1.5;background:rgba(0,0,0,0.35);border:1px solid #3d3522;border-radius:4px;padding:6px 10px}
+.sl div{padding:1px 0}
+.sl .b{color:#ece5d2}
+.sl .b.in{color:#a89f89;font-style:italic;font-size:11.5px}
+.sl .m{color:#4da3ff;text-shadow:0 0 2px rgba(0,0,0,0.8)}
+.sl .h{color:#64748b;font-style:italic}
+.sl .h.on{color:#ffd043;font-style:normal;text-shadow:0 0 4px rgba(255,208,67,0.4)}
+.sl .set{color:#f59e0b;font-weight:600}
+.sl .r{color:#f87171;font-size:12px}
+.sl .rng{color:#7dd3fc;font-weight:600}
+.it b.s5{position:absolute;left:3px;bottom:3px;width:7px;height:7px;border-radius:50%;box-shadow:0 0 0 1px #000}
+.cmp{border-top:1px solid var(--line);margin-top:8px;padding-top:8px;opacity:.85}
+.slotlist{display:grid;gap:8px}
+.slotrow{display:grid;grid-template-columns:44px 1fr auto auto;gap:8px;align-items:center;padding:8px;border:1px solid var(--line2);border-radius:6px;background:var(--panel2)}
+.slotrow.empty,.slotrow.del{grid-template-columns:1fr auto auto}
+.slotrow img{width:44px;height:54px;object-fit:contain}
+.slotrow small{display:block;color:var(--dim);font-size:11px}
+.slotrow.del{border-color:#c44}
+.facpick{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.facpick button{display:grid;grid-template-columns:48px 1fr;grid-template-rows:auto auto;column-gap:8px;align-items:center;text-align:left;padding:6px;border:1px solid var(--line2);border-radius:6px;background:var(--panel2);box-shadow:inset 3px 0 0 var(--c)}
+.facpick img{grid-row:1/3;width:48px;height:60px;object-fit:contain}
+.facpick b{font-family:var(--font);color:var(--gold)} .facpick small{color:var(--c)}
+#toast{position:absolute;left:50%;bottom:70px;transform:translateX(-50%);background:#000d;border:1px solid var(--gold2);padding:6px 12px;border-radius:6px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:11}
+#toast.on{opacity:1}
+.lootf{display:grid;gap:6px;font-size:13px} .lootf select{width:auto;display:inline-block}
+.dtabs{display:flex;gap:4px;flex-wrap:wrap;margin:6px 0} .dtabs button{padding:4px 10px;border:1px solid var(--line2);border-radius:14px;font-size:12px} .dtabs button.on{border-color:var(--gold);color:var(--gold)}
+.shoplist{display:grid;gap:4px;max-height:55vh;overflow:auto}
+.shoprow{display:grid;grid-template-columns:36px 1fr auto;gap:8px;align-items:center;text-align:left;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--panel2)}
+.shoprow img{width:36px;height:36px;object-fit:contain} .shoprow small{display:block;color:var(--dim);font-size:11px} .shoprow em{font-style:normal;color:var(--gold);font-size:12px}
+.shoprow.bad{opacity:.55} .shoprow.own{border-color:var(--gold2)}
+.chips{display:flex;flex-wrap:wrap;gap:4px} .chip2{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border:1px solid var(--line2);border-radius:12px;font-size:12px;background:#0b100e}
+/* dieu khien: nut che do, o ky nang, thuoc, the do dia phu */
+.chip{position:absolute;right:8px;top:34px;z-index:4;font-size:11px;padding:3px 9px;border-radius:12px;border:1px solid var(--gold2);background:#000a;color:var(--gold)}
+.chip.on{background:#3a2a10;box-shadow:0 0 8px #e6c67a66}
+#pad{position:absolute;right:8px;left:auto;bottom:8px;width:152px;height:auto;z-index:5;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;pointer-events:none}
+.pbtn{position:relative;width:44px;height:44px;border-radius:50%;border:2px solid var(--gold2);background:#0c120f center/cover no-repeat;overflow:hidden;pointer-events:auto;touch-action:none;box-shadow:0 2px 6px #000b}
+.pbtn i{position:absolute;inset:0;background:center/cover no-repeat}
+.pbtn b{position:absolute;right:3px;bottom:0;font-size:9px;color:#fff;text-shadow:0 0 2px #000}
+.pbtn.empty{border-style:dashed;opacity:.5} .pbtn.cur{border-color:#ffe07a;box-shadow:0 0 10px #ffd24a}
+.pbtn:active{transform:scale(.92)}
+.pbtn.pot{width:38px;height:38px;margin-top:6px} .pbtn.pot span{position:absolute;inset:0;display:grid;place-items:center;font:400 10px/1.05 var(--font);color:#fff;text-shadow:0 0 3px #000;text-align:center}
+.pbtn.hp{background:radial-gradient(#b3342a,#3a0c08)} .pbtn.mp{background:radial-gradient(#3a6ad0,#0c1a40)} .pbtn.tp{background:radial-gradient(#c9a23a,#3a2a08)}
+.pbtn .cd{position:absolute;inset:0;background:conic-gradient(#000b var(--p,0%),transparent 0);z-index:1}
+#townBar{position:absolute;left:8px;right:8px;top:64px;z-index:5;display:flex;gap:6px;align-items:center;padding:6px 8px;background:#000c;border:1px solid var(--gold2);border-radius:6px}
+#townBar b{flex:1;color:var(--gold);font-family:var(--font)}
+.skl .slots{display:flex;gap:3px;grid-column:2/5} .skl .slots button{font-size:10px;padding:1px 6px;border:1px solid var(--line2);border-radius:4px}
+.skl .slots button.on{border-color:var(--gold);color:var(--gold)}
+
+/* ======== Bo cuc thanh tab / nut chieu (hinh nen: jx1ui.css) ======== */
+#tabs button{position:relative;padding:25px 2px 5px;font-size:11px;line-height:1.1;min-height:44px;min-width:44px}
+#tabs button::before{content:"";position:absolute;left:50%;top:2px;width:20px;height:20px;margin-left:-10px;background-size:300% 100%;background-position:0 0}
+#tabs button.on::before{background-position:50% 0}
+#pad .pbtn.sk{background:url(ui/slot.png) center / 100% 100%,radial-gradient(#26302b,#0b100e)}
+.facpick button{position:relative}
+.s5b{position:absolute;right:4px;top:4px;width:28px;height:28px;background-size:200% 100%;background-position:0 0;filter:drop-shadow(0 0 2px #000)}
+.facpick button:hover .s5b{background-position:100% 0}
+
+/* ======== Chieu cao that cua man hinh (Safari / thanh cong cu dien thoai) + che do thu gon ======== */
+html,body{overscroll-behavior:none}
+#app{height:100vh;height:var(--app-h,100dvh)}
+#tabs{position:relative;z-index:6;touch-action:manipulation}
+#tabs button{touch-action:manipulation}
+#compactBtn{flex:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--gold2);background:radial-gradient(#26302b,#0b100e);color:var(--gold);font-size:15px;line-height:30px}
+body.compact #panel,body.compact #tabs{display:none!important}
+body.compact #battle{flex:1 1 auto}
+body.compact #compactBtn{background:radial-gradient(#4a3a18,#1a1206);box-shadow:0 0 6px #e6c67a88}
+
+/* ==== Man hinh ngang (landscape): san dau toan man hinh, bang thong tin ben phai ==== */
+@media (orientation:landscape){
+  #app{width:100vw;display:grid;grid-template-columns:1fr min(38vw,340px);grid-template-rows:auto 1fr auto;grid-template-areas:"top top" "battle panel" "tabs panel"}
+  #top{grid-area:top} #battle{grid-area:battle} #panel{grid-area:panel;border-top:0;border-left:1px solid var(--gold2)} #tabs{grid-area:tabs}
+  #pad{bottom:52px}
+  body.compact #app{grid-template-columns:1fr;grid-template-areas:"top" "battle" "tabs"}
+}
+
+/* Typography kiem hiep JX1 chuan */
+html,body,button,input,select,textarea{font-family:var(--font)}
+b,strong{font-weight:600}
+h1,h2,h3,h4{font-family:var(--font-title);font-weight:700;letter-spacing:0.5px}
+th{font-weight:600}
+
+/* nut doi chuot / joystick: chi hien tren may tinh man hinh ngang */
+#inBtn{display:none;position:absolute;right:8px;top:70px;z-index:4}
+body.deskland #inBtn{display:block}
+
+.cmp2{margin:6px 0;padding:6px 8px;border:1px solid var(--line2);border-radius:6px;background:#0b100e}
+.cmpv{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px}
+.cp{color:#7fe07f}.cn{color:#ff7a6a}
+.reqbad{margin-top:6px;color:#ff9a8a;font-size:12px}
+.reqnote{margin-top:6px;color:#e8c66a;font-size:12px}
+
+#rotBtn{right:auto;left:8px;top:auto;bottom:132px}
+#inBtn{right:auto!important;left:8px;top:auto!important;bottom:188px}
+
+/* giao dien di dong nho di 20%: ung dung rong / cao 1,25 lan roi thu nho 0,8 (uiScale trong render.js) */
+body.mob #app{transform:scale(.8);transform-origin:0 0;width:125vw!important;height:calc(var(--app-h,100dvh)*1.25)!important;margin:0!important;max-width:none}
+
+/* cong / rut diem / thong tin */
+.pm{display:inline-flex;gap:4px} .pm button{width:28px}
+.minus{width:28px;height:26px;border-radius:5px;border:1px solid #a55;color:#f88;background:#2e2222;font-weight:700}
+.minus:disabled{opacity:.35}
+.skinfo{width:28px;height:26px;border-radius:5px;border:1px solid var(--line2);color:var(--dim);background:#1b2420;font-style:italic}
+.skl .slots{grid-column:2/5}
+
+/* co chu chinh duoc (the Khac > Tro nang): ap dung cho bang thong tin, the, hop thoai */
+#panel,#modal .mbox,#tabs,#toast{zoom:var(--fs,1)}
+.todo{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px;padding:6px 8px;border:1px solid var(--gold2);border-radius:6px;background:#1a1f16}
+.todo b{color:var(--gold);font-size:12px;margin-right:2px}
+.todochip{cursor:pointer;border:1px solid var(--gold2);background:#26301f;color:var(--text)}
+.codex .card.lock{opacity:.55}
+.mbox:focus{outline:none}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+
+/* ---- hoat dong: pho ban, boss tuan, ma truong, ky luc ---- */
+#actBtn{position:relative;flex:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--gold2);background:radial-gradient(#3a1f1c,#120806);color:var(--gold);font-size:15px;line-height:30px}
+#actBtn.on::after{content:"";position:absolute;top:0;right:0;width:9px;height:9px;border-radius:50%;background:#e6c67a;box-shadow:0 0 0 2px #0f1613}
+.rech{margin:12px 0 6px;color:var(--gold);font-size:13px;font-weight:400}
+.rect{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:5px 10px;font-size:12px}
+.rect span:nth-child(odd){color:var(--dim)} .rect span:nth-child(even){text-align:right;overflow-wrap:anywhere}
+.dgc.lock{opacity:.55}
+.chip2.on{border-color:var(--gold);color:var(--gold)}
+.bar.xpb{position:relative;height:14px;margin:8px 0 4px;background:#000a;border:1px solid var(--line2);border-radius:3px;overflow:hidden}
+.bar.xpb i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#8a6a24,#e6c67a)}
+.bar.xpb span{position:relative;display:block;text-align:center;font-size:10px;line-height:12px}
+
+.it u.lk{position:absolute;right:1px;top:0;font-size:9px;text-decoration:none}
+.it u.en{position:absolute;left:2px;bottom:9px;font:10px var(--font);color:#ffd24a;text-decoration:none;text-shadow:0 0 2px #000}
+.presets{gap:4px;flex-wrap:wrap} .pslot{display:inline-flex;gap:2px}
+.forgecmp{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px} .forgecmp .sl{margin:0}
+.keepl{display:flex;align-items:flex-start;gap:6px;font-size:12px;margin:2px 0} .keepl input{margin-top:3px}
+
+.tmrow{align-items:center} .tmrow img{width:34px;height:34px;object-fit:contain;flex:none;margin-right:6px} .tmrow.lock{opacity:.55} .tmrow .btn{white-space:nowrap;line-height:1.2}
+.platrow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--line);font-size:12px} .platrow .btnrow{flex:none;margin:0;flex-direction:column;gap:4px}
+.chips.off{opacity:.45}
+.skb{font-style:normal;color:#7fe37a;margin-left:2px;font-size:11px}
+.skb{font-style:normal;color:#7fe37a;font-weight:700}
+.skl .lvl small{color:var(--dim);font-size:10px;margin-left:2px}
+#pad .sk{position:relative} #pad .sk .sklv{position:absolute;right:2px;top:1px;font:10px var(--font);color:#f3e6c0;text-decoration:none;text-shadow:0 0 2px #000,0 0 2px #000} #pad .sk .sklv.up{color:#7fe37a}
+.sdot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:1px;vertical-align:middle;box-shadow:0 0 0 1px #000}
+.newc input{flex:1;min-width:0;background:#0c1210;border:1px solid var(--line2);color:var(--text);padding:6px 8px;border-radius:4px;font:inherit}
+.seg{display:inline-flex;gap:4px}.seg .on{border-color:var(--gold);color:#1a1206;background:var(--gold)}
+.serpick{display:grid;grid-template-columns:1fr;gap:6px;margin:6px 0}.serpick button{text-align:left;padding:8px 10px;border:1px solid var(--line2);border-left:4px solid var(--c);border-radius:5px;background:#0c1210}.serpick button.on{background:#1f2a24;border-color:var(--c)}.serpick b{color:var(--c);margin-right:8px}.serpick small{display:block;color:var(--dim);font-size:11px}
+.facpick button[disabled]{opacity:.4}
+.stgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}.stgrid .btn{padding:8px 2px}.stgrid small{display:block;font-size:10px;color:var(--dim)}
+.zalt{display:flex;flex-wrap:wrap;gap:4px;margin:-2px 0 6px 10px}.zalt .chip2{font-size:11px;padding:2px 7px}.zalt .chip2.on{border-color:var(--gold);color:var(--gold)}
+.vgrid{display:grid;gap:4px;margin:6px 0}.vrow{padding:5px 8px;border:1px solid var(--line2);border-radius:4px;background:#0c1210}.vrow.done{border-color:#7a4fa0}.vrow.next{border-color:#c77bff}.vio{color:#c77bff}.vopt{display:flex;align-items:center;gap:8px;margin-top:4px}.vopt span{flex:1}.vtag{color:#c77bff;border:1px solid #7a4fa0;border-radius:3px;padding:0 4px;font-size:10px}
+.verpick{display:block;padding:6px 0;border-bottom:1px solid var(--line2)}
+/* ======== Lo Ep Do ======== */
+.ep-grid .it.ep-on{outline:2px solid #e6c67a;box-shadow:0 0 8px #e6c67a88}
+.it.ep-st{width:46px;flex:none;background:#0a0a0a}
+.it.ep-st img{max-width:80%}
+.it .ep-pl{color:#e6c67a;font-weight:700}
+.it .ep-n{position:absolute;left:2px;bottom:0;font:10px var(--font);color:#fff}
+.ep-opt{display:grid;grid-template-columns:46px 1fr auto auto;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid #2a2a26}
+.ep-slots{display:grid;gap:3px;margin:8px 0}
+.ep-slot{display:flex;gap:8px;align-items:center;min-height:30px;padding:3px 6px;background:#0c0c0b;border:1px solid #2e2e2a}
+.ep-slot img{width:24px;height:24px}
+.ep-slot.next{border-color:#e6c67a}
+.ep-slot.done .vio{color:#c77bff}
+.ep-no{min-width:16px;color:#e6c67a}
+.ep-ht{display:flex;flex-wrap:wrap;gap:6px}
+.ep-htc{position:relative;width:46px;height:46px;display:grid;place-items:center;background:#0a0a0a;border:1px solid #2e2e2a}
+.ep-htc img{width:36px}.ep-htc i{position:absolute;right:2px;bottom:0;font:10px var(--font);color:var(--dim)}.ep-htc b{position:absolute;left:2px;top:0;font:10px var(--font);color:#fff}
+.ep-row{display:flex;gap:8px;align-items:center;margin:4px 0}.ep-stones{display:flex;flex-wrap:wrap;gap:4px}
+button.ep-htc{cursor:pointer}.ep-htc.ep-on{outline:2px solid #e6c67a;box-shadow:0 0 8px #e6c67a88}
+.it.ep-st img,.ep-htc img,.ep-slot img{image-rendering:pixelated;width:auto;height:30px;max-width:none}
+.ep-slot img{height:22px}
+#mBody .card>label{display:block;margin-top:4px}
+.tag.buff{background:#3a3010;color:#ffe48a}.tag.aura{background:#103a30;color:#8ff0d0}.tag.curse{background:#2a1438;color:#d38bff}
+#skBuffs{position:absolute;left:8px;top:58px;z-index:4;display:flex;flex-wrap:wrap;gap:3px;max-width:60%;pointer-events:none}
+#skBuffs span{font-size:10px;padding:1px 5px;border-radius:8px;background:#000a;color:#ffe48a;border:1px solid #6d5a33}
+#skBuffs span.au{color:#8ff0d0;border-color:#2f6a5a}
+#t-skill .card>label{display:block;margin-top:4px}
+/* bieu tuong trang thai kieu JX1 */
+#skBuffs{gap:2px;top:56px;left:6px;max-width:70%}
+#skBuffs .sti{width:26px;text-align:center}
+#skBuffs .sti img{width:22px;height:22px;display:block;margin:0 auto;border:1px solid #000;background:#0008;image-rendering:pixelated;object-fit:contain}
+#skBuffs .sti b{display:block;font:700 9px/10px var(--font);color:#5dff5d;text-shadow:0 0 2px #000,0 0 2px #000,0 0 1px #000}
+.btn.knb{color:#ffd700!important}
+#giftTabs .gdot{display:inline-block;min-width:15px;padding:0 3px;margin-left:2px;border-radius:8px;background:#c0392b;color:#fff;font-size:9px;line-height:14px;text-align:center}
+
+/* v305: o chon do o Gui thu / Cho: vien xanh sang + dau tich */
+#nmInv .it.ep-on,#nkInv .it.ep-on{outline:3px solid #5dff7a;outline-offset:-1px;box-shadow:0 0 12px #5dff7acc;position:relative;filter:brightness(1.15)}
+#nmInv .it.ep-on::after,#nkInv .it.ep-on::after{content:"\2713";position:absolute;top:1px;right:3px;font:bold 15px sans-serif;color:#5dff7a;text-shadow:0 0 3px #000,0 0 3px #000}
+#nmPick{margin:4px 0;color:#5dff7a}
+
+/* v308 JX1: dong kinh nghiem / ngan luong */
+.xpl b{color:#7fe07f}.gdl b{color:#ffd24a}
+
+/* v314 bo loc Cho */
+.mktf{flex-wrap:wrap;gap:6px}.mktf select{max-width:48%;flex:1 1 30%}
+
+/* v318 bo suu tap Ma Truong */
+.hct{margin:6px 0 8px}.hct .chips{margin-top:3px}.hct .chip2{opacity:.45;font-size:11px}.hct .chip2.hc-on{opacity:1;border-color:#5fd46a;color:#9ff0a6}
+
+/* v329 an / hien da thuoc tinh */
+.ep-stones.ep-hide{display:none}.ep-otg{background:none;border:0;color:inherit;text-align:left;cursor:pointer;padding:2px 0;font:inherit}.ep-otg:hover{color:#ffe9a8}
+
+/* v335 khung thong tin kieu JX1 */
+.sl .rq{color:#ff5a4a}.sl .in{color:#e8e0d0;font-style:italic;opacity:.85;margin-bottom:2px}.sl .h{color:#3d5a8a}.sl .m{color:#8fc6ff}.sl .sep{border-top:1px solid #4a4030;margin:5px 0}
+
+/* v349: khoang min ~ max dong thuoc tinh (VLTK 2.0) */
+.sl .rng{color:#9a9278;font-size:11px;white-space:nowrap}
+
+/* v352: thong tin ky nang kieu JX1 */
+.jxsk .tt{color:#e8e0d0;font-weight:700;margin-top:4px}.jxsk .g{color:#7fd07f}.jxsk div{line-height:1.45}
