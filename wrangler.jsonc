@@ -1,4 +1,4 @@
-jsonc
+
 {
 "name": "vo-lam-idle-online",
 "main": "worker/src/index.js",
@@ -6,20 +6,21 @@ jsonc
 "assets": {
 "directory": "./public",
 "binding": "ASSETS",
-"run_worker_first": ["/api/*"]
-}
-}
-jsonc
-"d1_databases": [
-{
+"run_worker_first": ["/api/*"],
+
 "binding": "DB",
 "database_name": "vo-lam-idle-db",
 "database_id": "9deef75d-c0dc-49e4-913e-0cf8b704217c",
-"migrations_dir": "migrations"
+"migrations_dir": "migrations",
+
+
+  "d1_databases": [
+    {
+      "binding": "vo_lam_idle_tn",
+      "database_name": "vo-lam-idle-tn",
+      "database_id": "d0cd1bf7-2e46-4556-8ea1-fed6125d665d"
+    }
+  ]
 }
-]
-{
-	"ai": {
-		"binding": "AI" // i.e. available in your Worker on env.AI
-	}
+
 }
