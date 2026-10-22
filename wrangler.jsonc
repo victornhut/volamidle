@@ -1,5 +1,5 @@
 
-{
+
 "name": "vo-lam-idle-online",
 "main": "worker/src/index.js",
 "compatibility_date": "2026-10-01",
