@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const output = path.join(root, 'dist-cf');
+const output = path.join(root, 'public');
 
 const rootFiles = [
   'index.html', 'data.js', 'fx.js', 'fx2.js', 'fx3.js', 'jmo.js', 'jmo2.js',
