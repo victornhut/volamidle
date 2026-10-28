@@ -11,4 +11,14 @@
   "observability": {
     "enabled": true
   }
+
+
+
+  "d1_databases": [
+    {
+      "binding": "vo_lam_idle_tn",
+      "database_name": "vo-lam-idle-tn",
+      "database_id": "d0cd1bf7-2e46-4556-8ea1-fed6125d665d"
+    }
+
 }
