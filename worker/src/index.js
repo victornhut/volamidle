@@ -18,7 +18,7 @@ export default {
       }
       return json({
         ok: true,
-        service: "volamidle-zip",
+        service: "volamidle",
         runtime: "cloudflare-workers",
         assetsBound: Boolean(env.ASSETS),
         time: new Date().toISOString()
