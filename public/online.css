@@ -1,0 +1,570 @@
+#authGate{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:radial-gradient(circle,#284334,#0b110e 70%);color:#edf8ef;font:16px system-ui}
+#authGate section{width:min(360px,calc(100vw - 42px));padding:24px;border:1px solid #7caa75;border-radius:16px;background:#17251d;text-align:center}#authGate h1{margin:0 0 8px;color:#d7c27a}
+#authGate input,#authGate button{box-sizing:border-box;width:100%;margin:7px 0;padding:12px;border-radius:8px;border:1px solid #54755a;font:inherit}#authGate button{background:#c6a957;color:#16130a;font-weight:700;cursor:pointer}#authGate .alt{background:#2d5738;color:#fff}#authGate small{display:block;min-height:20px;color:#ffcfaa;margin-top:8px}#authGate a{color:#d7c27a;font-size:13px}#authGate button:disabled{opacity:.5}
+
+/* Hide difficulty selector */
+.card:has(.difficulty-setting),
+h3:has(+ .card .difficulty-setting),
+.difficulty-setting,
+.difficulty-segment,
+.difficulty-description {
+  display: none !important;
+}
+
+/* Hide Thao tác nhanh section */
+.afk-actions,
+section:has(.afk-actions),
+.card:has(.afk-actions),
+h3:has(+ .card .afk-actions) {
+  display: none !important;
+}
+
+/* Phần Cài Đặt chỉ hiển thị Điều khiển & Hiển thị và button Đóng */
+#t-more .account-section,
+#t-more h3:has(+ .account-section),
+#t-more .card.lootf:has(#bTut),
+#t-more h3:has(+ .card.lootf:has(#bTut)),
+#t-more #bSwitch {
+  display: none !important;
+}
+
+#t-more .character-actions {
+  display: flex !important;
+  justify-content: center !important;
+  margin: 14px 0 24px !important;
+}
+
+#t-more #bReset {
+  min-width: 140px !important;
+  background: linear-gradient(180deg, #43332b, #2b1f1a) !important;
+  border: 1px solid #735345 !important;
+  color: #fcece5 !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  padding: 9px 28px !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45) !important;
+  transition: all 0.2s ease !important;
+}
+
+#t-more #bReset:hover {
+  background: linear-gradient(180deg, #574338, #3b2b24) !important;
+  border-color: #9c7360 !important;
+  color: #fff !important;
+}
+
+
+
+/* Custom support QR styling matching golden theme */
+.support-qr {
+  background: #121a15 !important;
+  border: 1px solid #c9a55c99 !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(201, 165, 92, 0.25) !important;
+  border-radius: 14px !important;
+  padding: 6px !important;
+}
+.support-qr img {
+  border-radius: 10px !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  display: block !important;
+}
+
+/* Custom Zalo QR dialog styling */
+.zalo-qr {
+  background: #0f1822 !important;
+  border: 1px solid #38bdf899 !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(56, 189, 248, 0.25) !important;
+  border-radius: 14px !important;
+  padding: 6px !important;
+}
+.zalo-qr img {
+  border-radius: 10px !important;
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+}
+
+/* Cột ví tiền & button Hạng: Button Hạng nằm trên, Thỏi bạc & Thỏi vàng nằm dưới */
+.top-wallet-col {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  flex: none !important;
+  user-select: none !important;
+}
+
+/* Button Hạng nằm trên */
+.top-wallet-col .top-rank-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  background: linear-gradient(180deg, #d4a34b 0%, #a16e25 60%, #68420e 100%) !important;
+  border: 1px solid #f6d88e !important;
+  color: #fff9ea !important;
+  font-family: inherit !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  padding: 1px 7px !important;
+  height: 19px !important;
+  line-height: 17px !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+  text-shadow: 0 1px 2px #382006 !important;
+  transition: all 0.15s ease !important;
+  width: 100% !important;
+}
+
+.top-wallet-col .top-rank-btn:hover {
+  background: linear-gradient(180deg, #f0c36b 0%, #be8633 60%, #825415 100%) !important;
+  border-color: #ffe6a8 !important;
+  box-shadow: 0 0 8px rgba(246, 216, 142, 0.6), 0 2px 5px rgba(0, 0, 0, 0.6) !important;
+  transform: translateY(-1px) !important;
+}
+
+.top-wallet-col .top-rank-btn:active {
+  transform: translateY(1px) !important;
+}
+
+/* Khung hiển thị Tiền Vạn (thỏi bạc) & Kim Nguyên Bảo (thỏi vàng) nằm dưới */
+.top-wallet-col .gold {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  gap: 1px !important;
+  padding: 0 2px !important;
+  line-height: 1.15 !important;
+  user-select: none !important;
+  flex: none !important;
+  width: 100% !important;
+}
+
+.top-wallet-col .wallet-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+  white-space: nowrap !important;
+}
+
+.top-wallet-col .silver-coin {
+  width: 16px !important;
+  height: 13px !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6)) !important;
+  display: inline-block !important;
+}
+
+.top-wallet-col .gold-coin {
+  width: 14px !important;
+  height: 12px !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6)) !important;
+  display: inline-block !important;
+}
+
+.top-wallet-col #gold {
+  color: #ffd24a !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  font-family: inherit !important;
+  text-shadow: 0 1px 2px #000, 0 0 3px rgba(0, 0, 0, 0.8) !important;
+  letter-spacing: 0.2px !important;
+}
+
+.top-wallet-col #knbVal {
+  color: #ffd24a !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  font-family: inherit !important;
+  text-shadow: 0 1px 2px #000 !important;
+}
+
+.top-wallet-col .knb-unit {
+  color: #c9b98a !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.3px !important;
+}
+
+.top-wallet-col .knb-row:hover #knbVal,
+.top-wallet-col .knb-row:hover .knb-unit {
+  color: #fff9d2 !important;
+  text-shadow: 0 0 6px #ffd24a !important;
+}
+
+/* Mobile responsive cho giao diện điện thoại */
+@media (max-width: 480px) {
+  .top-wallet-col {
+    gap: 2px !important;
+    min-width: 58px !important;
+  }
+  .top-wallet-col .top-rank-btn {
+    height: 18px !important;
+    line-height: 16px !important;
+    font-size: 10px !important;
+    padding: 0 5px !important;
+    border-radius: 3px !important;
+  }
+  .top-wallet-col .wallet-row {
+    gap: 2.5px !important;
+  }
+  .top-wallet-col .silver-coin {
+    width: 15px !important;
+    height: 12px !important;
+  }
+  .top-wallet-col .gold-coin {
+    width: 13px !important;
+    height: 11px !important;
+  }
+  .top-wallet-col #gold {
+    font-size: 11.5px !important;
+  }
+  .top-wallet-col #knbVal {
+    font-size: 10.5px !important;
+  }
+  .top-wallet-col .knb-unit {
+    font-size: 8.5px !important;
+  }
+}
+
+/* Bảng Xếp Hạng Server Modal */
+.srv-rank-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.srv-rank-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.srv-rank-box {
+  width: min(580px, calc(100vw - 20px));
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(circle at 50% 0%, #1e2e25 0%, #0d1511 100%);
+  border: 1px solid #d4a34b;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.9), 0 0 24px rgba(212, 163, 75, 0.2);
+  color: #f1f7f3;
+  overflow: hidden;
+  animation: srvRankPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes srvRankPop {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.srv-rank-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(212, 163, 75, 0.35);
+  background: rgba(15, 23, 19, 0.8);
+}
+
+.srv-rank-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.srv-rank-title .icon {
+  font-size: 20px;
+}
+
+.srv-rank-title h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffd875;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.srv-rank-close {
+  background: none;
+  border: none;
+  color: #a4b3aa;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.srv-rank-close:hover {
+  color: #ff7b72;
+  background: rgba(255, 123, 114, 0.15);
+}
+
+.srv-rank-controls {
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(10, 16, 13, 0.6);
+  border-bottom: 1px solid rgba(212, 163, 75, 0.2);
+}
+
+.srv-rank-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.srv-tab-btn {
+  flex: 1;
+  padding: 7px 10px;
+  background: #142019;
+  border: 1px solid #2e4436;
+  border-radius: 6px;
+  color: #a4b3aa;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.srv-tab-btn:hover {
+  color: #ffd875;
+  border-color: #7d6532;
+}
+
+.srv-tab-btn.active {
+  background: linear-gradient(180deg, #3d301a, #261c0d);
+  border-color: #d4a34b;
+  color: #ffd875;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.srv-rank-filters {
+  display: flex;
+  gap: 8px;
+}
+
+.srv-fac-select,
+.srv-search-input {
+  background: #131d17;
+  border: 1px solid #334a3b;
+  border-radius: 6px;
+  color: #e4eee7;
+  padding: 6px 10px;
+  font-size: 12px;
+  outline: none;
+}
+
+.srv-fac-select {
+  flex: 0 0 140px;
+}
+
+.srv-search-input {
+  flex: 1;
+}
+
+.srv-fac-select:focus,
+.srv-search-input:focus {
+  border-color: #d4a34b;
+}
+
+.srv-rank-table-head {
+  display: flex;
+  align-items: center;
+  padding: 8px 14px;
+  background: rgba(18, 27, 22, 0.9);
+  border-bottom: 1px solid rgba(212, 163, 75, 0.2);
+  font-size: 11px;
+  font-weight: 700;
+  color: #d4a34b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.srv-rank-list {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 48vh;
+  padding: 4px 0;
+}
+
+.srv-rank-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: 13px;
+  transition: background 0.12s ease;
+}
+
+.srv-rank-row:hover {
+  background: rgba(212, 163, 75, 0.08);
+}
+
+.srv-rank-row.is-me {
+  background: rgba(212, 163, 75, 0.16);
+  border-left: 3px solid #ffd875;
+}
+
+.col-rank { flex: 0 0 46px; text-align: center; }
+.col-name { flex: 1 1 130px; display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: #fff; }
+.col-fac  { flex: 0 0 88px; font-size: 12px; }
+.col-lvl  { flex: 0 0 46px; text-align: center; font-size: 13px; }
+.col-stage{ flex: 0 0 68px; text-align: center; font-size: 12px; color: #a4b3aa; }
+.col-gold { flex: 0 0 88px; text-align: right; font-size: 12px; color: #f5d688; }
+
+.srv-rank-badge {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.srv-rank-badge.gold { color: #ffe600; background: rgba(255, 230, 0, 0.15); border: 1px solid rgba(255, 230, 0, 0.4); }
+.srv-rank-badge.silver { color: #e0e0e0; background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.4); }
+.srv-rank-badge.bronze { color: #f0a05a; background: rgba(240, 160, 90, 0.15); border: 1px solid rgba(240, 160, 90, 0.4); }
+.srv-rank-num { color: #8fa096; font-size: 12px; font-weight: 600; }
+
+.tag-me {
+  font-size: 10px;
+  font-weight: 700;
+  background: #ffd875;
+  color: #1a1206;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.srv-rank-loading,
+.srv-rank-empty {
+  padding: 30px 16px;
+  text-align: center;
+  color: #8fa096;
+  font-size: 13px;
+}
+
+.srv-rank-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-top: 1px solid rgba(212, 163, 75, 0.3);
+  background: rgba(12, 18, 15, 0.9);
+}
+
+.srv-my-rank {
+  font-size: 13px;
+  color: #e4eee7;
+}
+
+.srv-close-footer-btn {
+  background: linear-gradient(180deg, #43332b, #2b1f1a);
+  border: 1px solid #735345;
+  color: #fcece5;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 6px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.srv-close-footer-btn:hover {
+  background: linear-gradient(180deg, #574338, #3b2b24);
+  color: #fff;
+  border-color: #9c7360;
+}
+
+/* Ẩn chữ tên kỹ năng chính (như Kim Cang Phục Ma) */
+#mainSk {
+  display: none !important;
+}
+
+/* Thanh thao tác thành (Biện Kinh) đưa lên trên sát mép */
+#townBar {
+  top: 4px !important;
+  left: 8px !important;
+  right: 8px !important;
+  z-index: 10 !important;
+}
+
+/* Nút Cài đặt (cờ lê) và nút Auto đưa xuống dưới thanh thành, hoàn toàn không bị che */
+#autoControls {
+  top: 62px !important;
+  right: 8px !important;
+  z-index: 9 !important;
+}
+
+@media (max-width: 480px) {
+  #autoControls {
+    top: 64px !important;
+  }
+}
+
+/* Nút GiftCode kế bên nút Cài đặt Auto */
+#giftcodeBtn {
+  border: 1px solid #d4a024 !important;
+  color: #fff0bf !important;
+  cursor: pointer !important;
+  touch-action: manipulation !important;
+  background: radial-gradient(circle, #523412, #1f1206) !important;
+  border-radius: 50% !important;
+  flex: 0 0 28px !important;
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  place-items: center !important;
+  display: grid !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6), 0 0 4px rgba(255, 210, 74, 0.3) !important;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
+  animation: giftBtnPulse 2.4s infinite ease-in-out !important;
+}
+
+#giftcodeBtn img {
+  object-fit: contain !important;
+  width: 14px !important;
+  height: 14px !important;
+  display: block !important;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8)) !important;
+}
+
+#giftcodeBtn:hover {
+  border-color: #ffd24a !important;
+  box-shadow: 0 0 10px rgba(255, 210, 74, 0.8) !important;
+  transform: scale(1.08) !important;
+}
+
+#giftcodeBtn:active {
+  transform: scale(0.92) !important;
+}
+
+@keyframes giftBtnPulse {
+  0%, 100% {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6), 0 0 3px rgba(255, 210, 74, 0.3);
+    border-color: #d4a024;
+  }
+  50% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), 0 0 10px rgba(255, 210, 74, 0.7);
+    border-color: #ffe08a;
+  }
+}
+
