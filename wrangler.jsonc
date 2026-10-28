@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "volamidle-zip",
+  "name": "volamidle",
   "main": "worker/src/index.js",
   "compatibility_date": "2026-10-28",
   "assets": {
