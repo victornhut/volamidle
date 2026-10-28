@@ -19,7 +19,7 @@ namespace VolamIdleServer {
             Timeout = TimeSpan.FromSeconds(15)
         };
         private static readonly string RemoteOrigin = "https://volamidle.victornhut.workers.dev/";
-        private static readonly string SupabaseOrigin = "https://bzgxytkuwqvshbnkazyv.supabase.co";
+        
 
         private static readonly Dictionary<string, string> MimeTypes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) {
             { ".html", "text/html; charset=utf-8" },
