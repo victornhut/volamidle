@@ -1,0 +1,12 @@
+HUONG DAN CAI LOCAL SERVER CHO VOLAM-IDLE
+
+Do file game goc co hon 370 MB, goi patch nay chi chua bo chay local server va huong dan de tai/xuat ban nhe hon.
+
+1. Giai nen VOLAM-IDLE.zip ban da tai len vao mot thu muc, vi du C:\Games\VOLAM-IDLE.
+2. Giai nen goi VOLAM-IDLE-local-patch.zip.
+3. Copy 3 file trong goi patch vao thu muc VOLAM-IDLE vua giai nen, chon Replace/ghi de server.js neu Windows hoi.
+4. Cai Node.js LTS tu https://nodejs.org neu may chua co.
+5. Chay START-WINDOWS.bat. Trinh duyet tu mo dia chi localhost.
+6. De dung server, nhan Ctrl+C trong cua so terminal.
+
+Khong xoa cac thu muc img, fx, snd, music, ui, js va cac file data/world cua game.

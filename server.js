@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const { exec } = require("child_process");
 
+<<<<<<< Updated upstream
 const DEFAULT_PORT = 8080;
 const ROOT_DIR = __dirname;
 
@@ -109,3 +110,80 @@ function createServer(port) {
 }
 
 createServer(DEFAULT_PORT);
+=======
+const ROOT_DIR = __dirname;
+const DEFAULT_PORT = Number(process.env.PORT || 8080);
+const HOST = process.env.HOST || "127.0.0.1";
+const MIME_TYPES = {
+  ".html":"text/html; charset=utf-8", ".htm":"text/html; charset=utf-8",
+  ".css":"text/css; charset=utf-8", ".js":"application/javascript; charset=utf-8",
+  ".json":"application/json; charset=utf-8", ".webmanifest":"application/manifest+json; charset=utf-8",
+  ".png":"image/png", ".jpg":"image/jpeg", ".jpeg":"image/jpeg", ".webp":"image/webp",
+  ".avif":"image/avif", ".gif":"image/gif", ".svg":"image/svg+xml", ".ico":"image/x-icon",
+  ".mp3":"audio/mpeg", ".wav":"audio/wav", ".ogg":"audio/ogg", ".m4a":"audio/mp4",
+  ".woff":"font/woff", ".woff2":"font/woff2", ".ttf":"font/ttf", ".otf":"font/otf",
+  ".wasm":"application/wasm", ".txt":"text/plain; charset=utf-8"
+};
+function start(port) {
+  const server = http.createServer((req, res) => {
+    let pathname;
+    try { pathname = decodeURIComponent(new URL(req.url, `http://${req.headers.host || "localhost"}`).pathname); }
+    catch { res.writeHead(400); return res.end("Bad Request"); }
+    if (pathname === "/") pathname = "/index.html";
+    const target = path.resolve(ROOT_DIR, "." + pathname);
+    if (target !== ROOT_DIR && !target.startsWith(ROOT_DIR + path.sep)) {
+      res.writeHead(403, {"Content-Type":"text/plain; charset=utf-8"}); return res.end("403 Forbidden");
+    }
+    fs.stat(target, (err, stats) => {
+      if (err || !stats.isFile()) {
+        res.writeHead(404, {"Content-Type":"text/plain; charset=utf-8", "Cache-Control":"no-store"});
+        return res.end("404 Not Found: " + pathname);
+      }
+      const ext = path.extname(target).toLowerCase();
+      const headers = {
+        "Content-Type": MIME_TYPES[ext] || "application/octet-stream",
+        "X-Content-Type-Options": "nosniff",
+        "Cache-Control": "no-cache"
+      };
+      const range = req.headers.range;
+      if (range && /^bytes=\d*-\d*$/.test(range) && [".mp3",".wav",".ogg",".m4a"].includes(ext)) {
+        const [startText,endText] = range.slice(6).split("-");
+        const start = startText ? Number(startText) : 0;
+        const end = endText ? Math.min(Number(endText), stats.size - 1) : stats.size - 1;
+        if (start > end || start >= stats.size) {
+          res.writeHead(416, {"Content-Range": `bytes */${stats.size}`}); return res.end();
+        }
+        res.writeHead(206, {...headers, "Accept-Ranges":"bytes", "Content-Range":`bytes ${start}-${end}/${stats.size}`, "Content-Length":end-start+1});
+        fs.createReadStream(target, {start,end}).pipe(res);
+        return;
+      }
+      res.writeHead(200, {...headers, "Content-Length":stats.size});
+      if (req.method === "HEAD") return res.end();
+      fs.createReadStream(target).pipe(res);
+    });
+  });
+  server.on("error", err => {
+    if (err.code === "EADDRINUSE") {
+      console.log(`Cổng ${port} đang được sử dụng; thử cổng ${port + 1}...`);
+      start(port + 1);
+    } else {
+      console.error("Không thể khởi động máy chủ:", err.message);
+      process.exitCode = 1;
+    }
+  });
+  server.listen(port, HOST, () => {
+    console.log("==================================================");
+    console.log(" VO LAM IDLE - LOCAL WEB SERVER");
+    console.log(` URL: http://${HOST}:${port}`);
+    console.log(` Thu muc: ${ROOT_DIR}`);
+    console.log(" Dung server: Ctrl + C");
+    console.log("==================================================");
+    const url = `http://${HOST}:${port}`;
+    const command = process.platform === "win32"
+      ? `start "" "${url}"`
+      : process.platform === "darwin" ? `open "${url}"` : `xdg-open "${url}"`;
+    setTimeout(() => exec(command, () => {}), 700);
+  });
+}
+start(DEFAULT_PORT);
+>>>>>>> Stashed changes
