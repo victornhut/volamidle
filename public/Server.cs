@@ -18,7 +18,7 @@ namespace VolamIdleServer {
         private static readonly HttpClient RemoteClient = new HttpClient(HttpHandler) {
             Timeout = TimeSpan.FromSeconds(15)
         };
-        private static readonly string RemoteOrigin = "https://volamidle.pages.dev";
+        private static readonly string RemoteOrigin = "https://volamidle.victornhut.workers.dev/";
         private static readonly string SupabaseOrigin = "https://bzgxytkuwqvshbnkazyv.supabase.co";
 
         private static readonly Dictionary<string, string> MimeTypes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) {
