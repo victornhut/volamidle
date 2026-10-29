@@ -1,0 +1,243 @@
+-- NET_SETUP.sql
+-- Supabase PostgreSQL schema for Vo Lam Idle: multiplayer rooms, characters,
+-- inventory transfer/trading, and currency ledger.
+-- Run once in Supabase Dashboard > SQL Editor using the project owner.
+-- This does NOT create game accounts; accounts are managed by Supabase Auth.
+
+begin;
+
+create extension if not exists pgcrypto;
+
+create table if not exists public.player_profiles (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  username text unique,
+  display_name text,
+  level integer not null default 1 check (level >= 1),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.game_rooms (
+  id uuid primary key default gen_random_uuid(),
+  room_code text not null unique,
+  name text not null check (length(trim(name)) between 1 and 80),
+  region text not null default 'default',
+  max_players integer not null default 50 check (max_players between 1 and 500),
+  created_by uuid not null references auth.users(id) on delete restrict,
+  is_public boolean not null default true,
+  status text not null default 'open' check (status in ('open','playing','closed')),
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.room_members (
+  room_id uuid not null references public.game_rooms(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  role text not null default 'player' check (role in ('owner','player','moderator')),
+  joined_at timestamptz not null default now(),
+  last_seen_at timestamptz not null default now(),
+  primary key (room_id, user_id)
+);
+
+create table if not exists public.player_characters (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  name text not null check (length(trim(name)) between 1 and 40),
+  class_name text not null default 'vo_dang',
+  level integer not null default 1 check (level >= 1),
+  exp bigint not null default 0 check (exp >= 0),
+  hp bigint not null default 100 check (hp >= 0),
+  mp bigint not null default 100 check (mp >= 0),
+  gold bigint not null default 0 check (gold >= 0),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (user_id, name)
+);
+
+create table if not exists public.inventory_items (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  character_id uuid references public.player_characters(id) on delete cascade,
+  item_code text not null,
+  item_name text not null,
+  quantity integer not null default 1 check (quantity > 0),
+  attributes jsonb not null default '{}'::jsonb,
+  is_locked boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists inventory_items_user_idx on public.inventory_items(user_id);
+create index if not exists inventory_items_character_idx on public.inventory_items(character_id);
+
+create table if not exists public.trades (
+  id uuid primary key default gen_random_uuid(),
+  from_user_id uuid not null references auth.users(id) on delete restrict,
+  to_user_id uuid not null references auth.users(id) on delete restrict,
+  status text not null default 'pending' check (status in ('pending','accepted','rejected','cancelled','completed','expired')),
+  from_gold bigint not null default 0 check (from_gold >= 0),
+  to_gold bigint not null default 0 check (to_gold >= 0),
+  message text,
+  expires_at timestamptz not null default (now() + interval '10 minutes'),
+  created_at timestamptz not null default now(),
+  completed_at timestamptz,
+  check (from_user_id <> to_user_id)
+);
+
+create index if not exists trades_from_user_idx on public.trades(from_user_id, created_at desc);
+create index if not exists trades_to_user_idx on public.trades(to_user_id, status, created_at desc);
+
+create table if not exists public.trade_items (
+  id uuid primary key default gen_random_uuid(),
+  trade_id uuid not null references public.trades(id) on delete cascade,
+  offered_by uuid not null references auth.users(id) on delete restrict,
+  inventory_item_id uuid not null references public.inventory_items(id) on delete restrict,
+  quantity integer not null check (quantity > 0),
+  unique (trade_id, inventory_item_id)
+);
+
+create table if not exists public.currency_ledger (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete restrict,
+  delta bigint not null check (delta <> 0),
+  balance_after bigint,
+  reason text not null,
+  reference_id uuid,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists currency_ledger_user_idx on public.currency_ledger(user_id, created_at desc);
+
+create table if not exists public.chat_messages (
+  id bigint generated by default as identity primary key,
+  room_id uuid not null references public.game_rooms(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  message text not null check (length(trim(message)) between 1 and 1000),
+  created_at timestamptz not null default now()
+);
+
+create index if not exists chat_messages_room_created_idx on public.chat_messages(room_id, created_at desc);
+
+create table if not exists public.game_events (
+  id bigint generated by default as identity primary key,
+  room_id uuid references public.game_rooms(id) on delete set null,
+  user_id uuid references auth.users(id) on delete set null,
+  event_type text not null,
+  payload jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists game_events_room_created_idx on public.game_events(room_id, created_at desc);
+
+-- Keep profile records synchronized with Supabase Auth users.
+create or replace function public.handle_new_auth_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  base_name text;
+begin
+  base_name := coalesce(nullif(new.raw_user_meta_data->>'username',''),
+                        nullif(split_part(coalesce(new.email,''),'@',1),''),
+                        'player');
+  insert into public.player_profiles(user_id, username, display_name)
+  values (new.id, left(base_name, 40), left(coalesce(new.raw_user_meta_data->>'display_name', base_name), 80))
+  on conflict (user_id) do nothing;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created_profile on auth.users;
+create trigger on_auth_user_created_profile
+after insert on auth.users
+for each row execute procedure public.handle_new_auth_user();
+
+create or replace function public.set_updated_at()
+returns trigger language plpgsql as $$
+begin
+  new.updated_at := now();
+  return new;
+end;
+$$;
+
+drop trigger if exists player_profiles_set_updated_at on public.player_profiles;
+create trigger player_profiles_set_updated_at before update on public.player_profiles
+for each row execute procedure public.set_updated_at();
+
+drop trigger if exists player_characters_set_updated_at on public.player_characters;
+create trigger player_characters_set_updated_at before update on public.player_characters
+for each row execute procedure public.set_updated_at();
+
+drop trigger if exists inventory_items_set_updated_at on public.inventory_items;
+create trigger inventory_items_set_updated_at before update on public.inventory_items
+for each row execute procedure public.set_updated_at();
+
+-- Enable RLS. Browser clients must not directly modify inventories/trades;
+-- the trusted Worker uses the Supabase service-role key stored as a secret.
+alter table public.player_profiles enable row level security;
+alter table public.game_rooms enable row level security;
+alter table public.room_members enable row level security;
+alter table public.player_characters enable row level security;
+alter table public.inventory_items enable row level security;
+alter table public.trades enable row level security;
+alter table public.trade_items enable row level security;
+alter table public.currency_ledger enable row level security;
+alter table public.chat_messages enable row level security;
+alter table public.game_events enable row level security;
+
+drop policy if exists profiles_read_authenticated on public.player_profiles;
+create policy profiles_read_authenticated on public.player_profiles
+for select to authenticated using (true);
+
+drop policy if exists rooms_read_authenticated on public.game_rooms;
+create policy rooms_read_authenticated on public.game_rooms
+for select to authenticated using (is_public = true or created_by = auth.uid());
+
+drop policy if exists room_members_read_authenticated on public.room_members;
+create policy room_members_read_authenticated on public.room_members
+for select to authenticated using (true);
+
+drop policy if exists characters_owner_read on public.player_characters;
+create policy characters_owner_read on public.player_characters
+for select to authenticated using (user_id = auth.uid());
+
+drop policy if exists inventory_owner_read on public.inventory_items;
+create policy inventory_owner_read on public.inventory_items
+for select to authenticated using (user_id = auth.uid());
+
+drop policy if exists trades_participant_read on public.trades;
+create policy trades_participant_read on public.trades
+for select to authenticated using (from_user_id = auth.uid() or to_user_id = auth.uid());
+
+drop policy if exists trade_items_participant_read on public.trade_items;
+create policy trade_items_participant_read on public.trade_items
+for select to authenticated using (
+  exists (select 1 from public.trades t where t.id = trade_id
+          and (t.from_user_id = auth.uid() or t.to_user_id = auth.uid()))
+);
+
+drop policy if exists currency_ledger_owner_read on public.currency_ledger;
+create policy currency_ledger_owner_read on public.currency_ledger
+for select to authenticated using (user_id = auth.uid());
+
+drop policy if exists chat_read_room_members on public.chat_messages;
+create policy chat_read_room_members on public.chat_messages
+for select to authenticated using (
+  exists (select 1 from public.room_members rm where rm.room_id = chat_messages.room_id and rm.user_id = auth.uid())
+);
+
+drop policy if exists events_read_room_members on public.game_events;
+create policy events_read_room_members on public.game_events
+for select to authenticated using (
+  user_id = auth.uid() or exists (
+    select 1 from public.room_members rm where rm.room_id = game_events.room_id and rm.user_id = auth.uid()
+  )
+);
+
+-- Direct browser writes are intentionally not granted by these policies.
+-- Trade acceptance and item transfer must be implemented as a server-side
+-- atomic transaction/RPC with row locks; never trust client-supplied ownership,
+-- quantities, or gold balances.
+
+commit;
