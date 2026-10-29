@@ -156,6 +156,9 @@ export class WorldRoom {
   }
 
   async fetch(request) {
+    const roomMatch = new URL(request.url).pathname.match(/^\/api\/ws\/rooms\/([0-9a-f-]{36})$/i);
+    if (!roomMatch) return json({ ok: false, error: "INVALID_ROOM_ID" }, 400);
+    this.roomIdValue = roomMatch[1];
     if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
       return json({ ok: false, error: "WEBSOCKET_UPGRADE_REQUIRED" }, 426);
     }
@@ -279,7 +282,6 @@ export class WorldRoom {
   }
 
   roomId() {
-    // Room id is assigned as the Durable Object name by the Worker; it is passed in the request path.
     return this.roomIdValue;
   }
 
@@ -292,7 +294,6 @@ export class WorldRoom {
       if (!response.ok) return null;
       const user = await response.json();
       if (!user?.id) return null;
-      this.roomIdValue = this.roomIdValue || this.state.id.toString();
       return { id: user.id };
     } catch {
       return null;
