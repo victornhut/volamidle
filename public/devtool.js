@@ -51,6 +51,18 @@
         '{length:Math.max(0,Lt-A.petBox.length)}'
       );
 
+      // Hook sửa EXP quái ở cấp cao: bảng exp lên cấp tăng rất dốc (cấp 150 cần 8e8 exp) nhưng exp gốc mỗi quái
+      // (hàm mf) chỉ tăng +5/cấp (~1.950 ở cấp 150) => thanh exp đứng 0.0%, cần ~400.000 lần hạ quái mới lên 1 cấp.
+      // Sàn mới: exp mỗi quái >= exp_cần_để_lên_cấp / window.__xpMaxKills (mặc định 3000 lần hạ quái cùng cấp/cấp).
+      // Cấp thấp không đổi (vì vốn đã dưới 3000 lần). Chỉnh: window.__xpMaxKills = 1500 (nhanh hơn) | 0 (tắt hook).
+      {
+        const xpOld = '$l=function(A){return mf(A)}';
+        const xpNew = '$l=function(A){const b=mf(A),k=window.__xpMaxKills!==undefined?+window.__xpMaxKills:3000,' +
+          'x=k>0&&E&&E.exp?E.exp[Math.min(A|0,E.exp.length)-1]:0;return x>0?Math.max(b,x/k):b}';
+        if (code.includes(xpOld)) code = code.split(xpOld).join(xpNew);
+        else console.warn('[devtool] Không tìm thấy hàm exp gốc $l trong app.js — hook EXP bị bỏ qua');
+      }
+
       // Hook Hồng Bao & Đại Hồng Bao: Cho phép mở mượt mà khi chơi offline hoặc dùng đồ GM
       code = code.replace(
         'if(!X8())return M("Cần đăng nhập để mở Hồng Bao");',
