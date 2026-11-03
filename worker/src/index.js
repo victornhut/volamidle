@@ -9,8 +9,8 @@ function json(data, status = 200) {
 }
 
 function supabaseConfig(env) {
-  const url = (env.SUPABASE_URL || "").replace(/\/$/, "");
-  const key = env.SUPABASE_SERVICE_ROLE_KEY;
+  const url = (env.SUPABASE_URL || "").trim().replace(/\/$/, "");
+  const key = (env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
   if (!url || !key) throw new Error("Thiếu SUPABASE_URL hoặc SUPABASE_SERVICE_ROLE_KEY.");
   return { url, key };
 }
@@ -19,7 +19,7 @@ async function db(env, path, options = {}) {
   const { url, key } = supabaseConfig(env);
   const headers = new Headers(options.headers || {});
   headers.set("apikey", key);
-  headers.set("authorization", `Bearer ${key}`);
+  if (key.startsWith("eyJ")) headers.set("authorization", `Bearer ${key}`);
   headers.set("content-type", "application/json");
   const response = await fetch(`${url}/rest/v1/${path}`, { ...options, headers });
   const body = await response.text();
@@ -29,22 +29,63 @@ async function db(env, path, options = {}) {
   return body ? JSON.parse(body) : null;
 }
 
+async function checkToken(env, token) {
+  const { url, key } = supabaseConfig(env);
+  const anon = (env.SUPABASE_ANON_KEY || "").trim();
+  const candidates = [...new Set([anon, key].filter(Boolean))];
+  let detail = "";
+  for (const apikey of candidates) {
+    try {
+      const response = await fetch(`${url}/auth/v1/user`, {
+        headers: { apikey, authorization: `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const user = await response.json();
+        if (user && user.id) return { id: user.id, token };
+        detail = "auth/v1/user không trả về id";
+      } else {
+        detail = `auth/v1/user ${response.status}: ${(await response.text()).slice(0, 200)}`;
+      }
+    } catch (error) {
+      detail = `không gọi được Supabase: ${error.message || error}`;
+    }
+  }
+  return { fail: detail || "không có khóa Supabase" };
+}
+
 async function authenticate(request, env) {
   const authorization = request.headers.get("authorization") || "";
-  const token = authorization.replace(/^Bearer\s+/i, "");
-  if (!token) return null;
-  const { url, key } = supabaseConfig(env);
-  const response = await fetch(`${url}/auth/v1/user`, {
-    headers: { apikey: env.SUPABASE_ANON_KEY || key, authorization: `Bearer ${token}` }
-  });
-  if (!response.ok) return null;
-  const user = await response.json();
-  return user && user.id ? { id: user.id, token } : null;
+  const token = authorization.replace(/^Bearer\s+/i, "").trim();
+  if (!token) return { fail: "thiếu access token trong yêu cầu" };
+  return checkToken(env, token);
 }
 
 function randomRoomCode() {
   const bytes = crypto.getRandomValues(new Uint8Array(5));
   return Array.from(bytes, b => (b % 36).toString(36)).join("").toUpperCase();
+}
+
+const WORLD_ROOM_ID = "00000000-0000-4000-8000-0000000a11d0";
+let worldRoomReady = false;
+
+// Phòng chung cho cả thế giới: tự tạo nếu chưa có, và thêm người chơi vào phòng.
+async function ensureWorldRoom(env, userId) {
+  if (!worldRoomReady) {
+    await db(env, "game_rooms?on_conflict=id", {
+      method: "POST",
+      headers: { Prefer: "resolution=ignore-duplicates,return=minimal" },
+      body: JSON.stringify([{
+        id: WORLD_ROOM_ID, room_code: "WORLD", name: "Giang hồ", region: "default",
+        max_players: 500, created_by: userId, is_public: false, status: "open"
+      }])
+    });
+    worldRoomReady = true;
+  }
+  await db(env, "room_members?on_conflict=room_id,user_id", {
+    method: "POST",
+    headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+    body: JSON.stringify([{ room_id: WORLD_ROOM_ID, user_id: userId, role: "player", last_seen_at: new Date().toISOString() }])
+  });
 }
 
 function roomStub(env, roomId) {
@@ -78,7 +119,9 @@ export default {
     if (url.pathname.startsWith("/api/")) {
       try {
         const user = await authenticate(request, env);
-        if (!user) return json({ ok: false, error: "UNAUTHORIZED", message: "Vui lòng đăng nhập lại." }, 401);
+        if (!user || user.fail) {
+          return json({ ok: false, error: "UNAUTHORIZED", message: "Vui lòng đăng nhập lại.", detail: user?.fail || "" }, 401);
+        }
 
         if (url.pathname === "/api/rooms" && request.method === "GET") {
           const rooms = await db(env, "game_rooms?select=id,room_code,name,region,max_players,is_public,status,created_at&is_public=eq.true&status=neq.closed&order=created_at.desc&limit=50");
@@ -125,6 +168,11 @@ export default {
           return json({ ok: true, room });
         }
 
+        if (url.pathname === "/api/world/join" && request.method === "POST") {
+          await ensureWorldRoom(env, user.id);
+          return json({ ok: true, room_id: WORLD_ROOM_ID });
+        }
+
         return json({ ok: false, error: "NOT_FOUND" }, 404);
       } catch (error) {
         return json({ ok: false, error: "SERVER_ERROR", message: error.message || "Lỗi máy chủ." }, 500);
@@ -151,7 +199,6 @@ export class WorldRoom {
   constructor(state, env) {
     this.state = state;
     this.env = env;
-    this.players = new Map();
     this.lastMessageAt = new Map();
   }
 
@@ -166,7 +213,7 @@ export class WorldRoom {
     const client = pair[0];
     const server = pair[1];
     this.state.acceptWebSocket(server);
-    server.serializeAttachment({ authenticated: false, userId: null, username: null, x: 0, y: 0 });
+    server.serializeAttachment({ authenticated: false, roomId: this.roomIdValue });
     server.send(JSON.stringify({ type: "connected", message: "Gửi access_token bằng gói auth để tham gia phòng." }));
     return new Response(null, { status: 101, webSocket: client });
   }
@@ -182,6 +229,8 @@ export class WorldRoom {
     }
 
     let attachment = ws.deserializeAttachment() || { authenticated: false };
+    if (attachment.roomId) this.roomIdValue = attachment.roomId;
+
     if (!attachment.authenticated) {
       if (message.type !== "auth" || typeof message.access_token !== "string") {
         ws.send(JSON.stringify({ type: "error", error: "AUTH_REQUIRED" }));
@@ -200,21 +249,25 @@ export class WorldRoom {
         ws.close(1008, "Join room first");
         return;
       }
-      const profiles = await this.db(`player_profiles?user_id=eq.${identity.id}&select=username,display_name&limit=1`);
-      const profile = profiles?.[0];
+      // Một tài khoản chỉ giữ một kết nối: đóng kết nối cũ nếu có.
+      for (const other of this.state.getWebSockets()) {
+        if (other === ws) continue;
+        const a = other.deserializeAttachment();
+        if (a?.authenticated && a.userId === identity.id) {
+          try { other.close(1000, "Replaced by a new connection"); } catch {}
+        }
+      }
       attachment = {
         authenticated: true,
+        roomId: this.roomId(),
         userId: identity.id,
-        username: profile?.display_name || profile?.username || "Người chơi",
+        username: "Người chơi",
         role: members[0].role,
-        x: 0,
-        y: 0
+        map: "", x: 0, y: 0, name: "", f: 0, sx: 0, lvl: 1, dir: 0, mv: 0, j: null
       };
       ws.serializeAttachment(attachment);
-      this.players.set(identity.id, { ws, ...attachment });
-      this.broadcast({ type: "player_joined", player: this.publicPlayer(attachment) }, ws);
-      ws.send(JSON.stringify({ type: "ready", self: this.publicPlayer(attachment), players: this.getPlayers() }));
-      await this.recordEvent(identity.id, "player_joined", { username: attachment.username });
+      ws.send(JSON.stringify({ type: "ready", self: this.publicPlayer(attachment), players: [] }));
+      await this.recordEvent(identity.id, "player_joined", {});
       return;
     }
 
@@ -230,11 +283,41 @@ export class WorldRoom {
         ws.send(JSON.stringify({ type: "error", error: "INVALID_POSITION" }));
         return;
       }
+      const clean = (value, max) => typeof value === "string"
+        ? value.replace(/[\u0000-\u001f\u007f<>]/g, "").trim().slice(0, max) : "";
+      const int = (value, min, max, fallback) => {
+        const n = Math.trunc(Number(value));
+        return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
+      };
+
+      const oldMap = attachment.map || "";
+      const newMap = clean(message.map, 60);
+      attachment.map = newMap;
       attachment.x = x;
       attachment.y = y;
+      attachment.name = clean(message.name, 24) || attachment.name || "Vô danh";
+      attachment.f = int(message.f, 0, 200, attachment.f || 0);
+      attachment.sx = int(message.sx, 0, 1, attachment.sx || 0);
+      attachment.lvl = int(message.lvl, 1, 999, attachment.lvl || 1);
+      attachment.dir = int(message.dir, 0, 15, 0);
+      attachment.mv = int(message.mv, 0, 1, 0);
+      if (message.j === null) {
+        attachment.j = null;
+      } else if (message.j && typeof message.j === "object") {
+        const text = JSON.stringify(message.j);
+        if (text.length <= 400) attachment.j = message.j;
+      }
       ws.serializeAttachment(attachment);
-      this.players.set(attachment.userId, { ws, ...attachment });
-      this.broadcast({ type: "player_moved", player: this.publicPlayer(attachment) }, ws);
+
+      if (oldMap && oldMap !== newMap) {
+        this.broadcast({ type: "player_left", user_id: attachment.userId }, ws, oldMap);
+      }
+      if (newMap && oldMap !== newMap) {
+        ws.send(JSON.stringify({ type: "players", map: newMap, players: this.getPlayers(newMap, ws) }));
+      }
+      if (newMap) {
+        this.broadcast({ type: "player_moved", player: { ...this.publicPlayer(attachment), at: int(message.at, 0, 1, 0) } }, ws, newMap);
+      }
       return;
     }
 
@@ -248,9 +331,9 @@ export class WorldRoom {
       });
       const saved = rows?.[0];
       this.broadcast({ type: "chat", message: {
-        id: saved?.id ?? null, user_id: attachment.userId, username: attachment.username,
+        id: saved?.id ?? null, user_id: attachment.userId, username: attachment.name || attachment.username,
         message: text, created_at: saved?.created_at || new Date().toISOString()
-      }});
+      }}, null, attachment.map || null);
       return;
     }
 
@@ -263,7 +346,7 @@ export class WorldRoom {
 
   async webSocketClose(ws, code, reason) {
     await this.removeSocket(ws);
-    ws.close(code, reason);
+    try { ws.close(code && code >= 1000 && code < 1005 ? code : 1000, reason); } catch {}
   }
 
   async webSocketError(ws) {
@@ -273,12 +356,10 @@ export class WorldRoom {
   async removeSocket(ws) {
     const attachment = ws.deserializeAttachment() || {};
     if (!attachment.userId) return;
-    const current = this.players.get(attachment.userId);
-    if (current?.ws === ws) {
-      this.players.delete(attachment.userId);
-      this.broadcast({ type: "player_left", user_id: attachment.userId });
-      await this.recordEvent(attachment.userId, "player_left", {});
+    if (attachment.map) {
+      this.broadcast({ type: "player_left", user_id: attachment.userId }, ws, attachment.map);
     }
+    await this.recordEvent(attachment.userId, "player_left", {});
   }
 
   roomId() {
@@ -287,22 +368,16 @@ export class WorldRoom {
 
   async authenticateToken(token) {
     try {
-      const { url, key } = this.config();
-      const response = await fetch(`${url}/auth/v1/user`, {
-        headers: { apikey: this.env.SUPABASE_ANON_KEY || key, authorization: `Bearer ${token}` }
-      });
-      if (!response.ok) return null;
-      const user = await response.json();
-      if (!user?.id) return null;
-      return { id: user.id };
+      const result = await checkToken(this.env, token);
+      return result.id ? { id: result.id } : null;
     } catch {
       return null;
     }
   }
 
   config() {
-    const url = (this.env.SUPABASE_URL || "").replace(/\/$/, "");
-    const key = this.env.SUPABASE_SERVICE_ROLE_KEY;
+    const url = (this.env.SUPABASE_URL || "").trim().replace(/\/$/, "");
+    const key = (this.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
     if (!url || !key) throw new Error("Supabase env vars missing");
     return { url, key };
   }
@@ -311,7 +386,7 @@ export class WorldRoom {
     const { url, key } = this.config();
     const headers = new Headers(options.headers || {});
     headers.set("apikey", key);
-    headers.set("authorization", `Bearer ${key}`);
+    if (key.startsWith("eyJ")) headers.set("authorization", `Bearer ${key}`);
     headers.set("content-type", "application/json");
     const response = await fetch(`${url}/rest/v1/${path}`, { ...options, headers });
     const body = await response.text();
@@ -332,20 +407,42 @@ export class WorldRoom {
   }
 
   publicPlayer(player) {
-    return { user_id: player.userId, username: player.username, x: player.x || 0, y: player.y || 0 };
+    return {
+      user_id: player.userId,
+      name: player.name || player.username || "Vô danh",
+      x: player.x || 0, y: player.y || 0,
+      map: player.map || "",
+      f: player.f || 0, sx: player.sx || 0, lvl: player.lvl || 1,
+      dir: player.dir || 0, mv: player.mv || 0,
+      j: player.j || null
+    };
   }
 
-  getPlayers() {
-    return Array.from(this.players.values(), player => this.publicPlayer(player));
+  // Danh sách người chơi trong cùng một bản đồ (trừ chính socket yêu cầu).
+  getPlayers(map, except = null) {
+    const players = [];
+    for (const socket of this.state.getWebSockets()) {
+      if (socket === except) continue;
+      try {
+        const a = socket.deserializeAttachment();
+        if (a?.authenticated && a.map && a.map === map) players.push(this.publicPlayer(a));
+      } catch {
+        // Ignore closed sockets.
+      }
+    }
+    return players;
   }
 
-  broadcast(payload, except = null) {
+  // Gửi cho tất cả socket đã đăng nhập; nếu có `map` thì chỉ gửi cho người cùng bản đồ.
+  broadcast(payload, except = null, map = null) {
     const serialized = JSON.stringify(payload);
     for (const socket of this.state.getWebSockets()) {
       if (socket === except) continue;
       try {
-        const attachment = socket.deserializeAttachment();
-        if (attachment?.authenticated) socket.send(serialized);
+        const a = socket.deserializeAttachment();
+        if (!a?.authenticated) continue;
+        if (map && a.map !== map) continue;
+        socket.send(serialized);
       } catch {
         // Ignore closed sockets.
       }
