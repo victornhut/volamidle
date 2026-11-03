@@ -9,8 +9,8 @@ function json(data, status = 200) {
 }
 
 function supabaseConfig(env) {
-  const url = (env.SUPABASE_URL || "").replace(/\/$/, "");
-  const key = env.SUPABASE_SERVICE_ROLE_KEY;
+  const url = (env.SUPABASE_URL || "").trim().replace(/\/$/, "");
+  const key = (env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
   if (!url || !key) throw new Error("Thiếu SUPABASE_URL hoặc SUPABASE_SERVICE_ROLE_KEY.");
   return { url, key };
 }
@@ -19,7 +19,7 @@ async function db(env, path, options = {}) {
   const { url, key } = supabaseConfig(env);
   const headers = new Headers(options.headers || {});
   headers.set("apikey", key);
-  headers.set("authorization", `Bearer ${key}`);
+  if (key.startsWith("eyJ")) headers.set("authorization", `Bearer ${key}`);
   headers.set("content-type", "application/json");
   const response = await fetch(`${url}/rest/v1/${path}`, { ...options, headers });
   const body = await response.text();
@@ -29,17 +29,35 @@ async function db(env, path, options = {}) {
   return body ? JSON.parse(body) : null;
 }
 
+async function checkToken(env, token) {
+  const { url, key } = supabaseConfig(env);
+  const anon = (env.SUPABASE_ANON_KEY || "").trim();
+  const candidates = [...new Set([anon, key].filter(Boolean))];
+  let detail = "";
+  for (const apikey of candidates) {
+    try {
+      const response = await fetch(`${url}/auth/v1/user`, {
+        headers: { apikey, authorization: `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const user = await response.json();
+        if (user && user.id) return { id: user.id, token };
+        detail = "auth/v1/user không trả về id";
+      } else {
+        detail = `auth/v1/user ${response.status}: ${(await response.text()).slice(0, 200)}`;
+      }
+    } catch (error) {
+      detail = `không gọi được Supabase: ${error.message || error}`;
+    }
+  }
+  return { fail: detail || "không có khóa Supabase" };
+}
+
 async function authenticate(request, env) {
   const authorization = request.headers.get("authorization") || "";
-  const token = authorization.replace(/^Bearer\s+/i, "");
-  if (!token) return null;
-  const { url, key } = supabaseConfig(env);
-  const response = await fetch(`${url}/auth/v1/user`, {
-    headers: { apikey: env.SUPABASE_ANON_KEY || key, authorization: `Bearer ${token}` }
-  });
-  if (!response.ok) return null;
-  const user = await response.json();
-  return user && user.id ? { id: user.id, token } : null;
+  const token = authorization.replace(/^Bearer\s+/i, "").trim();
+  if (!token) return { fail: "thiếu access token trong yêu cầu" };
+  return checkToken(env, token);
 }
 
 function randomRoomCode() {
@@ -101,7 +119,9 @@ export default {
     if (url.pathname.startsWith("/api/")) {
       try {
         const user = await authenticate(request, env);
-        if (!user) return json({ ok: false, error: "UNAUTHORIZED", message: "Vui lòng đăng nhập lại." }, 401);
+        if (!user || user.fail) {
+          return json({ ok: false, error: "UNAUTHORIZED", message: "Vui lòng đăng nhập lại.", detail: user?.fail || "" }, 401);
+        }
 
         if (url.pathname === "/api/rooms" && request.method === "GET") {
           const rooms = await db(env, "game_rooms?select=id,room_code,name,region,max_players,is_public,status,created_at&is_public=eq.true&status=neq.closed&order=created_at.desc&limit=50");
@@ -348,22 +368,16 @@ export class WorldRoom {
 
   async authenticateToken(token) {
     try {
-      const { url, key } = this.config();
-      const response = await fetch(`${url}/auth/v1/user`, {
-        headers: { apikey: this.env.SUPABASE_ANON_KEY || key, authorization: `Bearer ${token}` }
-      });
-      if (!response.ok) return null;
-      const user = await response.json();
-      if (!user?.id) return null;
-      return { id: user.id };
+      const result = await checkToken(this.env, token);
+      return result.id ? { id: result.id } : null;
     } catch {
       return null;
     }
   }
 
   config() {
-    const url = (this.env.SUPABASE_URL || "").replace(/\/$/, "");
-    const key = this.env.SUPABASE_SERVICE_ROLE_KEY;
+    const url = (this.env.SUPABASE_URL || "").trim().replace(/\/$/, "");
+    const key = (this.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
     if (!url || !key) throw new Error("Supabase env vars missing");
     return { url, key };
   }
@@ -372,7 +386,7 @@ export class WorldRoom {
     const { url, key } = this.config();
     const headers = new Headers(options.headers || {});
     headers.set("apikey", key);
-    headers.set("authorization", `Bearer ${key}`);
+    if (key.startsWith("eyJ")) headers.set("authorization", `Bearer ${key}`);
     headers.set("content-type", "application/json");
     const response = await fetch(`${url}/rest/v1/${path}`, { ...options, headers });
     const body = await response.text();

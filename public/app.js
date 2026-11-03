@@ -710,7 +710,7 @@ const connect=async()=>{
   if(!tok)throw new Error("no token");
   const r=await fetch("/api/world/join",{method:"POST",headers:{authorization:"Bearer "+tok}});
   const jn=await r.json();
-  if(!jn||!jn.ok)throw new Error("join");
+  if(!jn||!jn.ok){try{console.warn("[oth] world/join",r.status,jn)}catch{}throw new Error("join")}
   const ws=new WebSocket((location.protocol==="https:"?"wss://":"ws://")+location.host+"/api/ws/rooms/"+jn.room_id);
   N.ws=ws;
   ws.onopen=()=>{try{ws.send(JSON.stringify({type:"auth",access_token:tok}))}catch{}};
