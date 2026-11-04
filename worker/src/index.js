@@ -206,11 +206,17 @@ export default {
   }
 };
 
+// PK: cấp tối thiểu, tầm đánh tối đa (server cho phép), thời gian bất khả xâm phạm sau khi chết.
+const PK_MIN_LV = 30;
+const PK_RANGE = 380;
+const PK_SAFE_MS = 8000;
+
 export class WorldRoom {
   constructor(state, env) {
     this.state = state;
     this.env = env;
     this.lastMessageAt = new Map();
+    this.pkHitAt = new Map();
   }
 
   async fetch(request) {
@@ -274,7 +280,8 @@ export class WorldRoom {
         userId: identity.id,
         username: "Người chơi",
         role: members[0].role,
-        map: "", x: 0, y: 0, name: "", f: "", sx: 0, lvl: 1, dir: 0, mv: 0, j: null
+        map: "", x: 0, y: 0, name: "", f: "", sx: 0, lvl: 1, dir: 0, mv: 0, j: null,
+        pk: 0, hp: 100, safeUntil: 0, lastAtk: "", lastAtkAt: 0
       };
       ws.serializeAttachment(attachment);
       ws.send(JSON.stringify({ type: "ready", self: this.publicPlayer(attachment), players: [] }));
@@ -313,6 +320,8 @@ export class WorldRoom {
       attachment.lvl = int(message.lvl, 1, 999, attachment.lvl || 1);
       attachment.dir = int(message.dir, 0, 15, 0);
       attachment.mv = int(message.mv, 0, 1, 0);
+      attachment.pk = message.pk && attachment.lvl >= PK_MIN_LV && newMap ? 1 : 0;
+      attachment.hp = int(message.hp, 0, 100, 100);
       if (message.j === null) {
         attachment.j = null;
       } else if (message.j && typeof message.j === "object") {
@@ -330,6 +339,16 @@ export class WorldRoom {
       if (newMap) {
         this.broadcast({ type: "player_moved", player: { ...this.publicPlayer(attachment), at: int(message.at, 0, 1, 0) } }, ws, newMap);
       }
+      return;
+    }
+
+    if (message.type === "pk_hit") {
+      this.handlePkHit(attachment, message, now);
+      return;
+    }
+
+    if (message.type === "pk_res") {
+      await this.handlePkRes(ws, attachment, message, now);
       return;
     }
 
@@ -372,6 +391,70 @@ export class WorldRoom {
       this.broadcast({ type: "player_left", user_id: attachment.userId }, ws, attachment.map);
     }
     await this.recordEvent(attachment.userId, "player_left", {});
+  }
+
+  findSocket(userId, map) {
+    for (const socket of this.state.getWebSockets()) {
+      try {
+        const a = socket.deserializeAttachment();
+        if (a?.authenticated && a.userId === userId && a.map === map) return { socket, a };
+      } catch {
+        // Ignore closed sockets.
+      }
+    }
+    return null;
+  }
+
+  // Người tấn công báo một đòn đánh. Worker kiểm tra điều kiện rồi chuyển cho nạn nhân tự tính sát thương.
+  handlePkHit(me, message, now) {
+    const toId = typeof message.to === "string" ? message.to.slice(0, 40) : "";
+    if (!toId || toId === me.userId) return;
+    if (!me.pk || !me.map || me.lvl < PK_MIN_LV || (me.safeUntil || 0) > now) return;
+    const target = this.findSocket(toId, me.map);
+    if (!target) return;
+    const t = target.a;
+    if (!t.pk || t.lvl < PK_MIN_LV || (t.safeUntil || 0) > now) return;
+    if (Math.hypot((t.x || 0) - (me.x || 0), (t.y || 0) - (me.y || 0)) > PK_RANGE) return;
+    const dps = Number(message.dps);
+    if (!Number.isFinite(dps) || dps <= 0) return;
+
+    const key = `${me.userId}>${toId}`;
+    if (now - (this.pkHitAt.get(key) || 0) < 350) return;
+    if (this.pkHitAt.size > 2000) this.pkHitAt.clear();
+    this.pkHitAt.set(key, now);
+
+    t.lastAtk = me.userId;
+    t.lastAtkAt = now;
+    target.socket.serializeAttachment(t);
+    target.socket.send(JSON.stringify({
+      type: "pk_hit", from: me.userId, name: me.name || "Vô danh", lvl: me.lvl, dps: Math.min(dps, 1e12)
+    }));
+  }
+
+  // Nạn nhân báo kết quả (sát thương đã nhận, có chết không). Chỉ chấp nhận nếu vừa bị đúng người đó đánh.
+  async handlePkRes(ws, me, message, now) {
+    const toId = typeof message.to === "string" ? message.to.slice(0, 40) : "";
+    if (!toId || me.lastAtk !== toId || now - (me.lastAtkAt || 0) > 5000) return;
+    const d = Math.max(0, Math.min(1e12, Math.round(Number(message.d) || 0)));
+    const dead = message.dead ? 1 : 0;
+    const attacker = this.findSocket(toId, me.map);
+    if (attacker) {
+      attacker.socket.send(JSON.stringify({ type: "pk_res", from: me.userId, d, dead }));
+    }
+    if (dead && (me.safeUntil || 0) <= now) {
+      me.safeUntil = now + PK_SAFE_MS;
+      me.lastAtk = "";
+      me.hp = 0;
+      ws.serializeAttachment(me);
+      this.broadcast({
+        type: "pk_kill",
+        killer: attacker?.a.name || "Vô danh",
+        victim: me.name || "Vô danh",
+        killer_id: toId,
+        victim_id: me.userId
+      }, null, me.map);
+      await this.recordEvent(me.userId, "pk_death", { killer: toId, map: me.map });
+    }
   }
 
   roomId() {
@@ -426,7 +509,10 @@ export class WorldRoom {
       map: player.map || "",
       f: player.f || "", sx: player.sx || 0, lvl: player.lvl || 1,
       dir: player.dir || 0, mv: player.mv || 0,
-      j: player.j || null
+      j: player.j || null,
+      pk: player.pk || 0,
+      hp: player.hp ?? 100,
+      safe: (player.safeUntil || 0) > Date.now() ? 1 : 0
     };
   }
 
