@@ -112,6 +112,7 @@ export default {
         ok: true,
         service: "volamidle",
         runtime: "cloudflare-workers",
+        version: "pk-1",
         durableObjects: Boolean(env.WORLD_ROOM),
         supabaseConfigured: Boolean(env.SUPABASE_URL && env.SUPABASE_ANON_KEY && env.SUPABASE_SERVICE_ROLE_KEY),
         time: new Date().toISOString()
