@@ -866,6 +866,6 @@ window.pkToggle=function(on){
  return N.pk;
 };
 window.pkOn=function(){return!!N.pk};
-window.othDebug=function(){return{on:N.on,state:N.state,others:N.others.size,map:mapKey(),retryN:N.retryN,rx:N.rx,ign:N.ign,bad:N.bad,pk:N.pk}};
+window.othDebug=function(){return{on:N.on,state:N.state,others:N.others.size,map:mapKey(),retryN:N.retryN,rx:N.rx,ign:N.ign,bad:N.bad,pk:N.pk,list:[...N.others.values()].map(o=>({n:o.n,pk:o.pk,hp:o.hp,safe:o.safe,map:o.map,d:Math.round(Math.hypot(o.tx-v.x,o.ty-v.y))}))}};
 })();
 })();
