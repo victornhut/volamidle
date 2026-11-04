@@ -683,7 +683,7 @@ body.ngate-on #csel{display:none}
 const NETK="vlidle_oth";
 // Cân bằng PK: cấp tối thiểu · trần sát thương mỗi đòn (% máu tối đa của nạn nhân) · hệ số sát thương · nhịp đánh (ms) · tầm đánh cận/xa · thời gian bất khả xâm phạm sau khi chết
 const PK_MIN_LV=30,PK_CAP=.04,PK_K=1,PK_GAP=500,PK_R_MELEE=150,PK_R_RANGED=330,PK_SAFE_MS=8000;
-const N={rx:0,ign:0,bad:null,ws:null,state:0,retryT:0,retryN:0,others:new Map(),sentAt:0,hbAt:0,jAt:0,jj:null,last:"",pk:false,pkAt:0,pkNext:0,tgt:null,chaseAt:0,safeUntil:0,uiAt:0,
+const N={rx:0,ign:0,bad:null,ws:null,state:0,retryT:0,retryN:0,others:new Map(),sentAt:0,hbAt:0,jAt:0,jj:null,last:"",pk:false,pkAt:0,safeUntil:0,uiAt:0,
  on:(function(){try{return localStorage.getItem(NETK)!=="0"}catch{return true}})()};
 
 const mapKey=()=>{try{if(!F4()||!D||!D.fac)return"";const z=qA(Math.min(D.stage,sA));return z?`${SA.key}|${z.id}`:""}catch{return""}};
@@ -711,8 +711,7 @@ const pkHurt=q=>{
   const res=Math.min(70,n0.reduce((i,o)=>i+(P.res&&P.res[o]||0),0)/n0.length);
   const def=Math.max(0,P.def||0),al=Math.max(1,+q.lvl||1);
   const mit=(1-res/100)*(1-.5*def/(def+80*al+400));
-  const raw=q.dmg!=null?+q.dmg:(+q.dps||0)*PK_GAP/1e3;
-  const d=Math.max(1,Math.min(raw*mit*PK_K,P.life*PK_CAP));
+  const d=Math.max(1,Math.min((+q.dps||0)*PK_GAP/1e3*mit*PK_K,P.life*PK_CAP));
   c.life-=d;c.hurtT=.25;
   if(v.act!=="at"&&Math.random()<.3){v.act="hurt";v.actT=0}
   B0(v.x+wA(-10,10),v.y-36,"-"+I(d),"#ff6a5a",12);
@@ -724,88 +723,26 @@ const pkHurt=q=>{
 const pkShow=q=>{try{const o=N.others.get(q.from);if(o)B0(o.x+wA(-10,10),o.y-36,"-"+I(q.d),"#ffb35a",12)}catch{}};
 const pkKill=q=>{try{z('<b class="bad">⚔ '+m(String(q.killer||"?"))+'</b> đã hạ gục <b>'+m(String(q.victim||"?"))+"</b>")}catch{}};
 
-// --- PK: chọn chiêu + thi triển (dùng đúng chiêu chính / xoay chiêu, nội lực, hồi chiêu và hiệu ứng của game) ---
-const pickSkill=()=>{
- const P=c.P;if(!P)return null;
- let e=null;
- try{e=QH(P,false)}catch{}
- if(e&&e.id===T3)e=P.basic;
- return e||null;
-};
-// Trả về: true = đã đánh, "far" = ngoài tầm, false = không đánh được (hết nội lực / đang hồi chiêu...)
-const pkCast=(o,now)=>{
- const P=c.P,e=pickSkill();
- if(!P||!e||!N.ws||N.ws.readyState!==1)return false;
- const tg={x:o.tx,y:o.ty,r:17};
- if(XA(v,tg)>Math.min(Math.max(e.rad||75,75),450)){c.rotNext=null;return"far"}
- try{
-  w6(e);
-  if(e.cd)(c.skCd=c.skCd||{})[e.id]=(c.clock||0)+e.cd;
-  if(c.rotNext!=null){c.rotI=c.rotNext;c.rotNext=null}
-  hs(v,tg,e);
-  if(e.id)VD(e.id);
- }catch{}
- v.face=tg.x>=v.x?1:-1;v.dir=w2(tg.x-v.x,tg.y-v.y);v.act="at";v.actT=0;
- const rate=e.rate>0?e.rate:2,dps=e.dps||(P.main&&P.main.dps)||0;
- N.pkAt=now;N.pkNext=now+Math.max(380,1e3/rate);
- N.ws.send(JSON.stringify({type:"pk_hit",to:o.id,dmg:Math.round(dps/rate),sk:e.id|0,mel:e.melee?1:0}));
- return true;
-};
-
-// --- PK: mục tiêu chuột phải hoặc người gần nhất tự động đánh ---
+// --- PK: tự đánh người chơi bật PK đang trong tầm ---
 const pkTick=now=>{
  if(!N.pk)return;
  if(!(D.lvl>=PK_MIN_LV)||!F4()||c.deadT>0||c.life<=0||now<N.safeUntil)return;
+ if(now-N.pkAt<PK_GAP)return;
  const key=mapKey();if(!key)return;
- let tg=N.tgt?N.others.get(N.tgt):null;
- if(N.tgt&&(!tg||!tg.pk||tg.map!==key||now-tg.seen>3000)){N.tgt=null;tg=null}
- if(!tg){
-  let bd=1e9;
-  for(const o of N.others.values()){
-   if(!o.pk||o.safe||o.l<PK_MIN_LV||o.map!==key||now-o.seen>3000)continue;
-   const d=XA(v,{x:o.tx,y:o.ty});
-   if(d<bd){bd=d;tg=o}
-  }
- }
- if(!tg||now<N.pkNext)return;
- if(pkCast(tg,now)==="far"&&N.tgt===tg.id&&now-N.chaseAt>300){N.chaseAt=now;J.target={x:tg.tx,y:tg.ty}}
-};
-
-// --- Chuột phải vào người chơi khác: chọn làm mục tiêu và tung chiêu ---
-const hitOther=(cx,cy)=>{
- const r=z0.getBoundingClientRect(),sc=ED()||1;
- const wx=(cx-r.left)/sc+xA.x,wy=(cy-r.top)/sc+xA.y,key=mapKey();
- let best=null,bd=48;
+ const P=c.P;if(!P)return;
+ const n=(D.mainLock?P.main:P.bestAuto||P.main)||{};
+ const dps=n.dps||0;if(dps<=0)return;
+ const R=n.melee===false?PK_R_RANGED:PK_R_MELEE;
+ let best=null,bd=1e9;
  for(const o of N.others.values()){
-  if(o.map!==key)continue;
-  const d=Math.hypot(o.x-wx,o.y-20-wy);
-  if(d<bd){bd=d;best=o}
+  if(!o.pk||o.safe||o.l<PK_MIN_LV||o.map!==key||now-o.seen>3000)continue;
+  const d=Math.hypot(o.tx-v.x,o.ty-v.y);
+  if(d<=R&&d<bd){bd=d;best=o}
  }
- return best;
-};
-z0.addEventListener("pointerdown",e=>{
- if(e.button!==2||!N.on||N.state!==2)return;
- const o=hitOther(e.clientX,e.clientY);
- if(!o)return;
- e.preventDefault();e.stopImmediatePropagation();
- if(!N.pk){try{M("Bật PK trong menu Chế Độ để tấn công người chơi")}catch{}return}
- if(!o.pk){try{M(o.n+" chưa bật PK")}catch{}return}
- N.tgt=o.id;
- try{M("Tấn công: "+o.n)}catch{}
- N.pkNext=0;pkTick(Date.now());
-},true);
-z0.addEventListener("contextmenu",e=>{if(N.on&&N.state===2&&hitOther(e.clientX,e.clientY))e.preventDefault()},true);
-
-// --- Hiệu ứng chiêu của người khác (do Worker phát lại) ---
-const pkFx=q=>{
- try{
-  const a=N.others.get(q.from);if(!a)return;
-  const me=b&&b.user&&b.user.id,dst=q.to===me?v:N.others.get(q.to);
-  if(!dst)return;
-  const tx=dst===v?v.x:dst.x,ty=dst===v?v.y:dst.y;
-  a.atT=.45;a.dir=w2(tx-a.x,ty-a.y)&7;
-  hs({x:a.x,y:a.y},{x:tx,y:ty},{id:q.sk|0,nMis:1,melee:!!q.mel});
- }catch{}
+ if(!best)return;
+ N.pkAt=now;
+ v.face=best.tx>=v.x?1:-1;v.dir=w2(best.tx-v.x,best.ty-v.y);v.act="at";v.actT=0;
+ N.ws.send(JSON.stringify({type:"pk_hit",to:best.id,dps:Math.round(dps)}));
 };
 
 // --- Mục "PK" trong menu Chế Độ ---
@@ -850,7 +787,6 @@ const connect=async()=>{
    else if(q.type==="player_left")N.others.delete(q.user_id);
    else if(q.type==="pk_hit")pkHurt(q);
    else if(q.type==="pk_res")pkShow(q);
-   else if(q.type==="pk_fx")pkFx(q);
    else if(q.type==="pk_kill")pkKill(q);
   };
   ws.onclose=e=>{if(N.ws===ws){N.ws=null;N.state=0;N.others.clear();N.pk=false;N.retryT=e&&e.reason&&/Replaced/.test(e.reason)?120:Math.min(60,3*2**Math.min(N.retryN++,5))}};
@@ -930,6 +866,6 @@ window.pkToggle=function(on){
  return N.pk;
 };
 window.pkOn=function(){return!!N.pk};
-window.othDebug=function(){return{on:N.on,state:N.state,others:N.others.size,map:mapKey(),retryN:N.retryN,rx:N.rx,ign:N.ign,bad:N.bad,pk:N.pk}};
+window.othDebug=function(){return{on:N.on,state:N.state,others:N.others.size,map:mapKey(),retryN:N.retryN,rx:N.rx,ign:N.ign,bad:N.bad,pk:N.pk,list:[...N.others.values()].map(o=>({n:o.n,pk:o.pk,hp:o.hp,safe:o.safe,map:o.map,d:Math.round(Math.hypot(o.tx-v.x,o.ty-v.y))}))}};
 })();
 })();
