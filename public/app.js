@@ -678,12 +678,13 @@ body.ngate-on #csel{display:none}
     <div style="font-size:42px">🛠</div><h2 style="color:#f3d27a;margin:8px 0">Máy chủ đang bảo trì</h2>
     <p style="font-size:14px;line-height:1.5">${typeof A.msg=="string"?m(A.msg):"Đang dọn dẹp và nâng cấp máy chủ. Nhân vật của bạn vẫn an toàn (đã lưu trong máy)."}</p>
     <p style="font-size:12px;color:#b9a77d">Game tự vào lại khi bảo trì xong — không cần tải lại trang.</p></div>`,clearInterval(window.maintT),window.maintT=setInterval(()=>fetch("ver.json?t="+Date.now(),{cache:"no-store"}).then(e=>e.ok?e.json():null).then(e=>{e&&!e.bt&&location.reload()}).catch(()=>{}),6e4)},ZP=performance.now(),Ar=0,nr=0,dm=!1,hm="jxidle_ui",tr=[.9,1,1.15,1.3],jT=["Nhỏ","Vừa","Lớn","Rất lớn"],G1=null;UP(),window.addEventListener("orientationchange",()=>setTimeout(UP,50)),window.addEventListener("resize",UP);var Ti=1/60,um=10,QT=120,Ue=0,Wa=0,mm="",Za=0,$i=0,pm=0,We=0,ST=12*3600;(function(){try{const A=new Worker(URL.createObjectURL(new Blob(["setInterval(function(){postMessage(0)},1000)"],{type:"text/javascript"})));A.onmessage=lm}catch{setInterval(lm,1e3)}})(),CT(),typeof xg=="function"&&xg(),"serviceWorker"in navigator&&location.protocol.startsWith("http")&&navigator.serviceWorker.register("sw.js").catch(()=>{});var er=753;setInterval(TT,300*1e3);var Bm=()=>!!(window.matchMedia&&matchMedia("(pointer: coarse)").matches),GA={it:null,from:"",slot:"",src:null,el:null,x:0,y:0,on:!1,moved:!1},NT=()=>{const w=document.querySelector("#t-char .slot");return!!(w&&w.offsetParent!==null)},vm=(w,A)=>{const n=e0[w.d];return n===A||n==="ring"&&(A==="ring1"||A==="ring2")},Hm=(w,A)=>document.elementFromPoint(w,A),bm=w=>!!(w&&(w.id==="arena"||w.closest&&w.closest("#arena"))),LT=function(A){if(!D.inv.includes(A))return;if(A.lock){M("Món đang khóa 🔒 — mở khóa trước khi vứt");return}const n=()=>{if(!D.inv.includes(A))return;D.inv=D.inv.filter(e=>e!==A);const t=Math.random()*Math.PI*2;c.ground.push({it:A,x:v.x+Math.cos(t)*28,y:v.y+Math.sin(t)*18,age:0,thrown:1}),R=!0,c.dirty=!0,k(),V(),z(`🗑 Vứt <span style="color:${_A[A.r]||"#ddd"}">${m(A.n)}</span> xuống đất (bấm vào món dưới đất để nhặt lại; rời bản đồ sẽ mất)`)};(A.set||A.vio||A.plv||A.d===10)&&typeof J1=="function"?J1(`Vứt <b>${m(A.n)}</b> xuống đất? Rời bản đồ món sẽ mất.`,"Vứt","Hủy").then(t=>{t&&n()}):n()};document.addEventListener("pointerdown",w=>{if(w.button>0||!D||!D.fac||w.pointerType==="touch"||Bm())return;const A=w.target.closest&&w.target.closest(".it[data-uid]");if(!A)return;const n=!!A.closest("#u2bagw, #t-inv, #eqMini"),t=A.closest("#t-char .slot[data-slot]");if(!n&&!t)return;const e=+A.dataset.uid,a=n?D.inv.find(s=>s.uid===e):D.eq[t.dataset.slot];!a||t&&t.dataset.slot==="horse"||Object.assign(GA,{it:a,from:n?"bag":"eq",slot:t?t.dataset.slot:"",src:A,x:w.clientX,y:w.clientY,on:!0,moved:!1,el:null})},!0),document.addEventListener("pointermove",w=>{if(!GA.on)return;if(!GA.moved){if(Math.hypot(w.clientX-GA.x,w.clientY-GA.y)<8)return;GA.moved=!0,!d("#u2chw")&&!d("#u2kbw")&&(GA.el=GA.src.cloneNode(!0),GA.el.classList.add("eqdrag"),GA.el.style.width=GA.src.offsetWidth+"px",GA.el.style.height=GA.src.offsetHeight+"px",document.body.appendChild(GA.el)),GA.from==="bag"&&NT()&&document.querySelectorAll("#t-char .slot[data-slot]").forEach(t=>t.classList.toggle("eqok",vm(GA.it,t.dataset.slot)))}GA.el&&(GA.el.style.left=w.clientX+"px",GA.el.style.top=w.clientY+"px");const A=Hm(w.clientX,w.clientY),n=GA.from==="bag"&&A&&A.closest?A.closest("#t-char .slot[data-slot]"):null;document.querySelectorAll("#t-char .slot.eqhov").forEach(t=>t!==n&&t.classList.remove("eqhov")),n&&n.classList.add("eqhov"),document.body.classList.toggle("eqdrop-bag",GA.from==="eq"&&!!(A&&A.closest&&A.closest("#u2bagw, #t-inv, #eqMini"))),document.body.classList.toggle("eqdrop-gnd",GA.from==="bag"&&bm(A))},!0);var Mm=()=>{GA.on=!1,GA.el&&GA.el.remove(),GA.el=null,document.querySelectorAll("#t-char .slot.eqok, #t-char .slot.eqhov").forEach(w=>w.classList.remove("eqok","eqhov")),document.body.classList.remove("eqdrop-bag","eqdrop-gnd")};document.addEventListener("pointercancel",()=>{GA.on&&(Mm(),GA.moved=!1)},!0),document.addEventListener("dragstart",w=>{w.target.closest&&w.target.closest("#u2bagw .it, #t-inv .it, #t-char .it")&&w.preventDefault()},!0),document.addEventListener("pointerup",w=>{if(!GA.on)return;const A=GA.moved;if(Mm(),!A)return;const n=GA.it,t=Hm(w.clientX,w.clientY);if(GA.from==="bag"){const a=t&&t.closest?t.closest("#t-char .slot[data-slot]"):null,s=a&&a.dataset.slot;if(t&&t.closest&&t.closest("#t-char")&&!t.closest("#eqMini"))if(s&&(s==="ring1"||s==="ring2")&&e0[n.d]==="ring")if(!EA(n))M("Chưa mặc được: "+on(n).join("; "));else{const i=D.eq[s];D.inv=D.inv.filter(o=>o!==n),i&&D.inv.unshift(i),D.eq[s]=n,c.dirty=!0,R=!0,iA("equipCloth"),V()}else s&&!vm(n,s)?M("Món này không mặc ở ô đó"):n.d>=0&&n.d<=10&&T8(n);else bm(t)&&LT(n)}else GA.from==="eq"&&t&&t.closest&&t.closest("#u2bagw, #t-inv, #eqMini")&&e7(GA.slot);const e=a=>{a.stopPropagation(),a.preventDefault()};document.addEventListener("click",e,{capture:!0,once:!0}),setTimeout(()=>{document.removeEventListener("click",e,!0),GA.moved=!1},50)},!0);
+try{
 (function(){
 /* ===== Giang hồ online: nhìn thấy người chơi khác + PK (dùng hook othEnts/othDraw/othTick có sẵn) ===== */
 const NETK="vlidle_oth";
 // Cân bằng PK: cấp tối thiểu · trần sát thương mỗi đòn (% máu tối đa của nạn nhân) · hệ số sát thương · nhịp đánh (ms) · tầm đánh cận/xa · thời gian bất khả xâm phạm sau khi chết
 const PK_MIN_LV=30,PK_CAP=.04,PK_K=1,PK_GAP=500,PK_R_MELEE=150,PK_R_RANGED=330,PK_SAFE_MS=8000;
-const N={rx:0,ign:0,bad:null,ws:null,state:0,retryT:0,retryN:0,others:new Map(),sentAt:0,hbAt:0,jAt:0,jj:null,last:"",pk:false,pkAt:0,safeUntil:0,uiAt:0,
+const N={rx:0,ign:0,bad:null,ws:null,state:0,retryT:0,retryN:0,others:new Map(),sentAt:0,hbAt:0,jAt:0,jj:null,last:"",pk:false,pkAt:0,pkNext:0,tgt:null,chaseAt:0,safeUntil:0,uiAt:0,
  on:(function(){try{return localStorage.getItem(NETK)!=="0"}catch{return true}})()};
 
 const mapKey=()=>{try{if(!F4()||!D||!D.fac)return"";const z=qA(Math.min(D.stage,sA));return z?`${SA.key}|${z.id}`:""}catch{return""}};
@@ -711,7 +712,8 @@ const pkHurt=q=>{
   const res=Math.min(70,n0.reduce((i,o)=>i+(P.res&&P.res[o]||0),0)/n0.length);
   const def=Math.max(0,P.def||0),al=Math.max(1,+q.lvl||1);
   const mit=(1-res/100)*(1-.5*def/(def+80*al+400));
-  const d=Math.max(1,Math.min((+q.dps||0)*PK_GAP/1e3*mit*PK_K,P.life*PK_CAP));
+  const raw=q.dmg!=null?+q.dmg:(+q.dps||0)*PK_GAP/1e3;
+  const d=Math.max(1,Math.min(raw*mit*PK_K,P.life*PK_CAP));
   c.life-=d;c.hurtT=.25;
   if(v.act!=="at"&&Math.random()<.3){v.act="hurt";v.actT=0}
   B0(v.x+wA(-10,10),v.y-36,"-"+I(d),"#ff6a5a",12);
@@ -723,26 +725,98 @@ const pkHurt=q=>{
 const pkShow=q=>{try{const o=N.others.get(q.from);if(o)B0(o.x+wA(-10,10),o.y-36,"-"+I(q.d),"#ffb35a",12)}catch{}};
 const pkKill=q=>{try{z('<b class="bad">⚔ '+m(String(q.killer||"?"))+'</b> đã hạ gục <b>'+m(String(q.victim||"?"))+"</b>")}catch{}};
 
-// --- PK: tự đánh người chơi bật PK đang trong tầm ---
+// --- PK: chọn chiêu + thi triển (dùng đúng chiêu chính / xoay chiêu, nội lực, hồi chiêu và hiệu ứng của game) ---
+const pickSkill=()=>{
+ const P=c.P;if(!P)return null;
+ let e=null;
+ try{e=QH(P,false)}catch{}
+ if(e&&e.id===T3)e=P.basic;
+ return e||null;
+};
+// Trả về: true = đã đánh, "far" = ngoài tầm, false = không đánh được (hết nội lực / đang hồi chiêu...)
+const pkCast=(o,now)=>{
+ const P=c.P,e=pickSkill();
+ if(!P||!e||!N.ws||N.ws.readyState!==1)return false;
+ const tg={x:o.tx,y:o.ty,r:17};
+ if(XA(v,tg)>Math.min(Math.max(e.rad||75,75),450)){c.rotNext=null;return"far"}
+ try{
+  w6(e);
+  if(e.cd)(c.skCd=c.skCd||{})[e.id]=(c.clock||0)+e.cd;
+  if(c.rotNext!=null){c.rotI=c.rotNext;c.rotNext=null}
+  hs(v,tg,e);
+  if(e.id)VD(e.id);
+ }catch{}
+ v.face=tg.x>=v.x?1:-1;v.dir=w2(tg.x-v.x,tg.y-v.y);v.act="at";v.actT=0;
+ const rate=e.rate>0?e.rate:2,dps=e.dps||(P.main&&P.main.dps)||0;
+ N.pkAt=now;N.pkNext=now+Math.max(380,1e3/rate);
+ N.ws.send(JSON.stringify({type:"pk_hit",to:o.id,dmg:Math.round(dps/rate),sk:e.id|0,mel:e.melee?1:0}));
+ return true;
+};
+
+// --- PK: mục tiêu chuột phải hoặc người gần nhất tự động đánh ---
 const pkTick=now=>{
  if(!N.pk)return;
  if(!(D.lvl>=PK_MIN_LV)||!F4()||c.deadT>0||c.life<=0||now<N.safeUntil)return;
- if(now-N.pkAt<PK_GAP)return;
  const key=mapKey();if(!key)return;
- const P=c.P;if(!P)return;
- const n=(D.mainLock?P.main:P.bestAuto||P.main)||{};
- const dps=n.dps||0;if(dps<=0)return;
- const R=n.melee===false?PK_R_RANGED:PK_R_MELEE;
- let best=null,bd=1e9;
- for(const o of N.others.values()){
-  if(!o.pk||o.safe||o.l<PK_MIN_LV||o.map!==key||now-o.seen>3000)continue;
-  const d=Math.hypot(o.tx-v.x,o.ty-v.y);
-  if(d<=R&&d<bd){bd=d;best=o}
+ let tg=N.tgt?N.others.get(N.tgt):null;
+ if(N.tgt&&(!tg||!tg.pk||tg.map!==key||now-tg.seen>3000)){N.tgt=null;tg=null}
+ if(!tg){
+  let bd=1e9;
+  for(const o of N.others.values()){
+   if(!o.pk||o.safe||o.l<PK_MIN_LV||o.map!==key||now-o.seen>3000)continue;
+   const d=XA(v,{x:o.tx,y:o.ty});
+   if(d<bd){bd=d;tg=o}
+  }
  }
- if(!best)return;
- N.pkAt=now;
- v.face=best.tx>=v.x?1:-1;v.dir=w2(best.tx-v.x,best.ty-v.y);v.act="at";v.actT=0;
- N.ws.send(JSON.stringify({type:"pk_hit",to:best.id,dps:Math.round(dps)}));
+ if(!tg||now<N.pkNext)return;
+ if(pkCast(tg,now)==="far"&&N.tgt===tg.id&&now-N.chaseAt>300){N.chaseAt=now;J.target={x:tg.tx,y:tg.ty}}
+};
+
+// --- Chuột phải vào người chơi khác: chọn làm mục tiêu và tung chiêu ---
+const hitOther=(cx,cy)=>{
+ const cv=N.rcEl;if(!cv)return null;
+ const r=cv.getBoundingClientRect(),sc=ED()||1;
+ const wx=(cx-r.left)/sc+xA.x,wy=(cy-r.top)/sc+xA.y,key=mapKey();
+ let best=null,bd=48;
+ for(const o of N.others.values()){
+  if(o.map!==key)continue;
+  const d=Math.hypot(o.x-wx,o.y-20-wy);
+  if(d<bd){bd=d;best=o}
+ }
+ return best;
+};
+const onRightDown=e=>{
+ if(e.button!==2||!N.on||N.state!==2)return;
+ const o=hitOther(e.clientX,e.clientY);
+ if(!o)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ if(!N.pk){try{M("Bật PK trong menu Chế Độ để tấn công người chơi")}catch{}return}
+ if(!o.pk){try{M(o.n+" chưa bật PK")}catch{}return}
+ N.tgt=o.id;
+ try{M("Tấn công: "+o.n)}catch{}
+ N.pkNext=0;pkTick(Date.now());
+};
+const onRightMenu=e=>{if(N.on&&N.state===2&&hitOther(e.clientX,e.clientY))e.preventDefault()};
+// Canvas (z0) chỉ có sau khi game khởi động, nên gắn sự kiện muộn và chỉ một lần cho mỗi canvas.
+const bindRC=()=>{
+ let cv=null;
+ try{cv=z0}catch{}
+ if(!cv||N.rcEl===cv)return;
+ N.rcEl=cv;
+ cv.addEventListener("pointerdown",onRightDown,true);
+ cv.addEventListener("contextmenu",onRightMenu,true);
+};
+
+// --- Hiệu ứng chiêu của người khác (do Worker phát lại) ---
+const pkFx=q=>{
+ try{
+  const a=N.others.get(q.from);if(!a)return;
+  const me=b&&b.user&&b.user.id,dst=q.to===me?v:N.others.get(q.to);
+  if(!dst)return;
+  const tx=dst===v?v.x:dst.x,ty=dst===v?v.y:dst.y;
+  a.atT=.45;a.dir=w2(tx-a.x,ty-a.y)&7;
+  hs({x:a.x,y:a.y},{x:tx,y:ty},{id:q.sk|0,nMis:1,melee:!!q.mel});
+ }catch{}
 };
 
 // --- Mục "PK" trong menu Chế Độ ---
@@ -787,6 +861,7 @@ const connect=async()=>{
    else if(q.type==="player_left")N.others.delete(q.user_id);
    else if(q.type==="pk_hit")pkHurt(q);
    else if(q.type==="pk_res")pkShow(q);
+   else if(q.type==="pk_fx")pkFx(q);
    else if(q.type==="pk_kill")pkKill(q);
   };
   ws.onclose=e=>{if(N.ws===ws){N.ws=null;N.state=0;N.others.clear();N.pk=false;N.retryT=e&&e.reason&&/Replaced/.test(e.reason)?120:Math.min(60,3*2**Math.min(N.retryN++,5))}};
@@ -804,7 +879,7 @@ const lookNow=()=>{
 window.othTick=function(){
  try{
   const now=Date.now();
-  if(now-N.uiAt>500){N.uiAt=now;if(N.pk&&!F4()){N.pk=false;refreshMode()}paintBtn()}
+  if(now-N.uiAt>500){N.uiAt=now;bindRC();if(N.pk&&!F4()){N.pk=false;refreshMode()}paintBtn()}
   const want=N.on&&b&&b.user&&D&&D.fac;
   if(!want){if(N.ws||N.state)closeNet();return}
   if(N.state===0){if(now>=N.retryT*1e3+(N.failAt||0)){N.failAt=now;N.retryT=Math.max(N.retryT,3);connect()}return}
@@ -868,4 +943,5 @@ window.pkToggle=function(on){
 window.pkOn=function(){return!!N.pk};
 window.othDebug=function(){return{on:N.on,state:N.state,others:N.others.size,map:mapKey(),retryN:N.retryN,rx:N.rx,ign:N.ign,bad:N.bad,pk:N.pk,list:[...N.others.values()].map(o=>({n:o.n,pk:o.pk,hp:o.hp,safe:o.safe,map:o.map,d:Math.round(Math.hypot(o.tx-v.x,o.ty-v.y))}))}};
 })();
+}catch(e){try{console.error("[oth] init",e)}catch{}}
 })();
