@@ -8,8 +8,19 @@ function json(data, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: JSON_HEADERS });
 }
 
+// Chuẩn hóa SUPABASE_URL: chỉ lấy phần gốc (https://xxx.supabase.co), bỏ mọi đường dẫn thừa như /rest/v1.
+function normalizeSupabaseUrl(raw) {
+  const text = String(raw || "").trim();
+  if (!text) return "";
+  try {
+    return new URL(/^https?:\/\//i.test(text) ? text : `https://${text}`).origin;
+  } catch {
+    return text.replace(/\/+$/, "");
+  }
+}
+
 function supabaseConfig(env) {
-  const url = (env.SUPABASE_URL || "").trim().replace(/\/$/, "");
+  const url = normalizeSupabaseUrl(env.SUPABASE_URL);
   const key = (env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
   if (!url || !key) throw new Error("Thiếu SUPABASE_URL hoặc SUPABASE_SERVICE_ROLE_KEY.");
   return { url, key };
@@ -376,7 +387,7 @@ export class WorldRoom {
   }
 
   config() {
-    const url = (this.env.SUPABASE_URL || "").trim().replace(/\/$/, "");
+    const url = normalizeSupabaseUrl(this.env.SUPABASE_URL);
     const key = (this.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
     if (!url || !key) throw new Error("Supabase env vars missing");
     return { url, key };
