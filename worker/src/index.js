@@ -274,7 +274,7 @@ export class WorldRoom {
         userId: identity.id,
         username: "Người chơi",
         role: members[0].role,
-        map: "", x: 0, y: 0, name: "", f: 0, sx: 0, lvl: 1, dir: 0, mv: 0, j: null
+        map: "", x: 0, y: 0, name: "", f: "", sx: 0, lvl: 1, dir: 0, mv: 0, j: null
       };
       ws.serializeAttachment(attachment);
       ws.send(JSON.stringify({ type: "ready", self: this.publicPlayer(attachment), players: [] }));
@@ -307,7 +307,8 @@ export class WorldRoom {
       attachment.x = x;
       attachment.y = y;
       attachment.name = clean(message.name, 24) || attachment.name || "Vô danh";
-      attachment.f = int(message.f, 0, 200, attachment.f || 0);
+      const fac = clean(message.f, 24);
+      if (/^[A-Za-z0-9_]{1,24}$/.test(fac)) attachment.f = fac;
       attachment.sx = int(message.sx, 0, 1, attachment.sx || 0);
       attachment.lvl = int(message.lvl, 1, 999, attachment.lvl || 1);
       attachment.dir = int(message.dir, 0, 15, 0);
@@ -423,7 +424,7 @@ export class WorldRoom {
       name: player.name || player.username || "Vô danh",
       x: player.x || 0, y: player.y || 0,
       map: player.map || "",
-      f: player.f || 0, sx: player.sx || 0, lvl: player.lvl || 1,
+      f: player.f || "", sx: player.sx || 0, lvl: player.lvl || 1,
       dir: player.dir || 0, mv: player.mv || 0,
       j: player.j || null
     };
