@@ -681,17 +681,17 @@ body.ngate-on #csel{display:none}
 (function(){
 /* ===== Giang hồ online: nhìn thấy người chơi khác (dùng hook othEnts/othDraw/othTick có sẵn) ===== */
 const NETK="vlidle_oth";
-const N={ws:null,state:0,retryT:0,retryN:0,others:new Map(),sentAt:0,hbAt:0,jAt:0,jj:null,last:"",
+const N={rx:0,ign:0,bad:null,ws:null,state:0,retryT:0,retryN:0,others:new Map(),sentAt:0,hbAt:0,jAt:0,jj:null,last:"",
  on:(function(){try{return localStorage.getItem(NETK)!=="0"}catch{return true}})()};
 
 const mapKey=()=>{try{if(!F4()||!D||!D.fac)return"";const z=qA(Math.min(D.stage,sA));return z?`${SA.key}|${z.id}`:""}catch{return""}};
 
 const put=p=>{
- if(!p||!p.user_id||!j[p.f|0])return;
+ N.rx++;if(!p||!p.user_id||!p.f||!j[p.f]){N.ign++;N.bad=p&&p.f;return}
  let o=N.others.get(p.user_id);
  if(!o){o={id:p.user_id,x:+p.x||0,y:+p.y||0,t:Math.random()*2,atT:0,hurtT:0,hp:-1,hpMax:1,J:null,jk:"",mv:0};N.others.set(p.user_id,o)}
  o.tx=+p.x||0;o.ty=+p.y||0;o.map=String(p.map||"");
- o.n=String(p.name||"Vô danh").slice(0,24);o.f=p.f|0;o.s=p.sx?1:0;o.l=p.lvl|0;o.dir=(p.dir|0)&7;
+ o.n=String(p.name||"Vô danh").slice(0,24);o.f=String(p.f);o.s=p.sx?1:0;o.l=p.lvl|0;o.dir=(p.dir|0)&7;
  if(p.at&&!(o.atT>0))o.atT=.45;
  o.seen=Date.now();
  if(p.j){const k=JSON.stringify(p.j);if(k!==o.jk){o.jk=k;try{o.J=lC(p.j)}catch{o.J=null}}}
@@ -784,6 +784,6 @@ window.othToggle=function(on){
  try{M(N.on?"Hiện người chơi khác: BẬT":"Hiện người chơi khác: TẮT")}catch{}
  return N.on;
 };
-window.othDebug=function(){return{on:N.on,state:N.state,others:N.others.size,map:mapKey(),retryN:N.retryN}};
+window.othDebug=function(){return{on:N.on,state:N.state,others:N.others.size,map:mapKey(),retryN:N.retryN,rx:N.rx,ign:N.ign,bad:N.bad}};
 })();
 })();
