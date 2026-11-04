@@ -112,7 +112,7 @@ export default {
         ok: true,
         service: "volamidle",
         runtime: "cloudflare-workers",
-        version: "pk-1",
+        version: "pk-2",
         durableObjects: Boolean(env.WORLD_ROOM),
         supabaseConfigured: Boolean(env.SUPABASE_URL && env.SUPABASE_ANON_KEY && env.SUPABASE_SERVICE_ROLE_KEY),
         time: new Date().toISOString()
@@ -209,7 +209,7 @@ export default {
 
 // PK: cấp tối thiểu, tầm đánh tối đa (server cho phép), thời gian bất khả xâm phạm sau khi chết.
 const PK_MIN_LV = 30;
-const PK_RANGE = 380;
+const PK_RANGE = 520;
 const PK_SAFE_MS = 8000;
 
 export class WorldRoom {
@@ -344,7 +344,7 @@ export class WorldRoom {
     }
 
     if (message.type === "pk_hit") {
-      this.handlePkHit(attachment, message, now);
+      this.handlePkHit(ws, attachment, message, now);
       return;
     }
 
@@ -407,7 +407,7 @@ export class WorldRoom {
   }
 
   // Người tấn công báo một đòn đánh. Worker kiểm tra điều kiện rồi chuyển cho nạn nhân tự tính sát thương.
-  handlePkHit(me, message, now) {
+  handlePkHit(ws, me, message, now) {
     const toId = typeof message.to === "string" ? message.to.slice(0, 40) : "";
     if (!toId || toId === me.userId) return;
     if (!me.pk || !me.map || me.lvl < PK_MIN_LV || (me.safeUntil || 0) > now) return;
@@ -416,8 +416,10 @@ export class WorldRoom {
     const t = target.a;
     if (!t.pk || t.lvl < PK_MIN_LV || (t.safeUntil || 0) > now) return;
     if (Math.hypot((t.x || 0) - (me.x || 0), (t.y || 0) - (me.y || 0)) > PK_RANGE) return;
-    const dps = Number(message.dps);
-    if (!Number.isFinite(dps) || dps <= 0) return;
+    const dmg = Number(message.dmg);
+    if (!Number.isFinite(dmg) || dmg <= 0) return;
+    const sk = Math.max(0, Math.min(100000, Math.trunc(Number(message.sk)) || 0));
+    const mel = message.mel ? 1 : 0;
 
     const key = `${me.userId}>${toId}`;
     if (now - (this.pkHitAt.get(key) || 0) < 350) return;
@@ -428,8 +430,10 @@ export class WorldRoom {
     t.lastAtkAt = now;
     target.socket.serializeAttachment(t);
     target.socket.send(JSON.stringify({
-      type: "pk_hit", from: me.userId, name: me.name || "Vô danh", lvl: me.lvl, dps: Math.min(dps, 1e12)
+      type: "pk_hit", from: me.userId, name: me.name || "Vô danh", lvl: me.lvl, dmg: Math.min(dmg, 1e12)
     }));
+    // Mọi người cùng bản đồ (trừ người đánh) thấy hiệu ứng chiêu.
+    this.broadcast({ type: "pk_fx", from: me.userId, to: toId, sk, mel }, ws, me.map);
   }
 
   // Nạn nhân báo kết quả (sát thương đã nhận, có chết không). Chỉ chấp nhận nếu vừa bị đúng người đó đánh.
