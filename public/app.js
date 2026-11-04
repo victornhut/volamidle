@@ -326,7 +326,7 @@ ${Qw()?`    <div class="hksec">Chế Bạch Kim <small>thành công 100% · nh�
       <div class="btnrow">${A?'<button class="btn red" id="boatOut">Rời thuyền (không mất lượt)</button>':`<button class="btn" id="boatGo" ${N5()&&t4()&&!ue()?"":"disabled"}>${N5()?t4()?"⛵ Lên thuyền":"Hết chuyến hôm nay":`Cần cấp ${Ba}`}</button>`}</div></div>`},lh=function(A){const n=A.querySelector("#boatGo");n&&(n.onclick=()=>{nA(!0),Gc()});const t=A.querySelector("#boatOut");t&&(t.onclick=()=>{z("Rời thuyền Phong Lăng Độ."),rh()})},qc={id:337,n:"Phong Lăng Độ · Thuyền",bg:"img/z/337.jpg",bgFb:"img/z/336.jpg",lo:1,hi:200,m:[674],sw:[20,20,20,20,20]},Yc=3,n4=4,gh=240,Ba=90,S5=3,Kc=674,t4=()=>Math.max(0,Yc-(u8().boat||0)),N5=()=>D.lvl>=Ba||q().stat.reborn>0,L5=()=>!!(c.dg&&c.dg.kind==="boat"),dh=()=>L5()?S5:1,e4=function(A=D.lvl){let n=0;return MA.forEach((t,e)=>{t.lo<=A&&G5(e)&&(n=e)}),n},Rc=function(A){const n=Fc(A);let t=n,e=1e9;for(let a=0;a<k2;a++){const s=n+a;if(s>sA)break;const i=Math.abs(L4(s)-D.lvl);i<e&&(e=i,t=s)}return t},hh=function(){for(let A=0;A<MA.length;A++)G5(A)&&(D.maxStage=Math.max(D.maxStage||1,Math.min(sA,Fc(A)+k2-1)))},Yn=function(){if(c.ground.length){const A=I0();for(const n of c.ground.slice())!n.thrown&&$6(n.it,A)&&kf(n,!0);c.ground=[]}c.pickTarget=null,c.moveTo=null,c.tgt=null,c.manTgt=null,c.tgtBan&&c.tgtBan.clear(),typeof J<"u"&&(J.target=null,J.tmp=!1)},v1=function(A,n,t){if(!MA[A]||c.dg||c.tower)return!1;c.town&&I8();const e=Rc(A),a=s0(Math.min(D.stage,sA))===A;if(D.stage=e,D.wave=1,!a){t||(c.enemies=[],c.corpses=[],c.spawnT=.6),Yn();const s=qA(e);c.zoneShown=s.id,L1(s),c.banner={t:2.2,text:s.n,sub:n||`Cấp ${s.lo}–${s.hi}`},n&&z(`🗺 ${m(n)}: tới <b>${m(s.n)}</b>`)}return!0},a4=function(){if(hh(),c.dg||c.tower||c.town||c.sat)return;if(D.mode==="quest"||D.autoMap===!1){const t=Rc(s0(Math.min(D.stage,sA)));t!==D.stage&&(D.stage=t);return}const A=e4(),n=s0(Math.min(D.stage,sA));if(A!==n)v1(A,"Đủ cấp, đổi bãi luyện công");else{const t=Rc(A);t!==D.stage&&(D.stage=t)}},uh=function(A){if(q5-=A,q5>0||(q5=1.5,D.mode!=="quest"||!D.fac||c.dg||c.tower||c.deadT>0)||c.sat)return;c.town&&I8();const n=l0();if(D.lvl>=L0&&n.today>=Ut()&&D.autoLdt!==!1&&S("misc","ldt")>0&&me(!0),D.lvl>=L0&&n.today<Ut()){n.auto=!0,n.task||Xt();const e=n.task;if(e){if(V2(e)){pe(!0);return}if((e.t==="killm"||e.t==="elite"||e.t==="boss")&&e.zi!=null){{const i=MA[e.zi]?[MA[e.zi]].concat(s1[e.zi]||[]):null,o=i&&i[e.za||0];o?(e.zn=o.n,e.t==="killm"&&!o.m.includes(e.tid)&&(e.tid=TA(o.m.filter(P=>Z[P]).length?o.m.filter(P=>Z[P]):o.m)),e.t==="boss"&&e.tid!==o.boss&&(e.tid=o.boss)):(e.zi=null,e.t="elite")}const s=(D.zalt||{})[e.zi]||0;s0(Math.min(D.stage,sA))!==e.zi?((D.zalt||(D.zalt={}))[e.zi]=e.za||0,v1(e.zi,`Dã Tẩu: ${Jt(e)}`)):s!==(e.za||0)&&(D.zalt[e.zi]=e.za||0,Yn(),c.enemies=[],c.corpses=[],c.field=null,c.zoneShown=null,z(`🗺 Dã Tẩu: tới <b>${m(e.zn)}</b>`));return}const a=e4();s0(Math.min(D.stage,sA))!==a&&v1(a,`Dã Tẩu: ${Jt(e)}`);return}}if(D.autoSt!==!1&&S("misc","lb")>0&&D.lvl>=20){Nd(He(),!0);return}if(typeof t4=="function"&&N5()&&t4()>0&&NA()){Gc();return}const t=e4();s0(Math.min(D.stage,sA))!==t&&v1(t,"Hết nhiệm vụ, luyện công")},mh=function(A){if((D.mode||"farm")!==A){if(D.mode=A,c.dgSkip={},k(),c.dg&&c.dg.kind!=="wb"&&Nn(),c.tower&&A!=="tower"&&Et(!1),c.town&&I8(),c.dgPilotT=0,q5=0,c.towerPilotT=0,A==="quest")z("📜 Chế độ <b>Nhiệm Vụ</b>: dịch chuyển tới bản đồ nhiệm vụ.");else if(A==="tower")l8(St)?(z("🗼 Chế độ <b>Leo Tháp</b>: tự vào Thông Thiên Tháp, gục ngã thì chuyển về Luyện Công."),!c.tower&&!c.dg&&se()):(D.mode="farm",M(`Leo Tháp cần cấp ${St}`));else if(A==="dg")z("🏯 Chế độ <b>Phó Bản</b>: tự vào phó bản còn lượt."),M5()||M("Hết lượt phó bản hôm nay: luyện công");else{z("⚔ Chế độ <b>Luyện Công</b>.");const n=D.autoMap===!1?s0(Math.min(D.stage,sA)):e4();v1(n,"Luyện công")}V()}},D_=function(A){const n=D.mode==="quest",t=D.mode==="dg",e=l0(),a=e.task,s=c.dg?c.dg.kind==="boat"?"⛵ Đang đi thuyền Phong Lăng Độ":`Trong ${c.dg.kind==="wb"?"Boss tuần":m(c.dg.d.n)}`:c.sat?`🗡 Truy sát Sát Thủ cấp ${c.sat.tier}`:n?D.lvl>=L0&&e.today<x5&&a?`📜 Dã Tẩu: ${m(Jt(a))} ${k5(a)}`:"Hết nhiệm vụ: luyện công":t?M5()?`🏯 Sắp vào ${m(M5().n)}`:"🏯 Hết lượt phó bản: luyện công":"";return`<div class="card modec">
     <div><b>${m(A.n)}</b> <small class="dim">bản đồ cấp ${A.lo}–${A.hi} · quái cấp ${(()=>{const i=window.JSP&&JSP[A.id];if(!i)return"~"+L4(D.stage);let o=999,P=0;for(let r=3;r<i.length;r+=4)o=Math.min(o,i[r]),P=Math.max(P,i[r]);return o===P?o:o+"–"+P})()} · trùm hồi sinh ${Ag/60} phút</small></div>
     ${s?`<div class="small cp">${s}</div>`:""}
-    ${n?"":`<label class="small"><input type="checkbox" id="cAutoMap" ${D.autoMap===!1?"":"checked"}> Tự đổi bãi luyện công khi lên cấp</label>`}</div>`},ph=function(){let A=d("#modeSw");A||(A=document.createElement("div"),A.id="modeSw",A.innerHTML=`<button id="mswBtn"></button><div id="mswMenu" class="hidden">${Y5.map(t=>`<button data-msw="${t[0]}" title="${t[3]}">${t[1]} ${t[2]}</button>`).join("")}</div>`,d("#battle").appendChild(A),d("#mswBtn").onclick=t=>{t.stopPropagation(),d("#mswMenu").classList.toggle("hidden")},A.querySelectorAll("[data-msw]").forEach(t=>t.onclick=e=>{e.stopPropagation(),d("#mswMenu").classList.add("hidden"),mh(t.dataset.msw)}),document.addEventListener("pointerdown",t=>{A.contains(t.target)||d("#mswMenu").classList.add("hidden")})),A.classList.toggle("hidden",!D.fac);const n=Bh();d("#mswBtn").innerHTML=`Chế Độ: <b>${n[1]} ${n[2]}</b> ▴`,A.querySelectorAll("[data-msw]").forEach(t=>t.classList.toggle("on",t.dataset.msw===n[0]))},o_=function(){document.querySelectorAll("[data-mode]").forEach(n=>n.onclick=()=>mh(n.dataset.mode));const A=d("#cAutoMap");A&&(A.onchange=()=>{D.autoMap=A.checked,A.checked&&a4(),k(),V()})},sE=3,Fc=w=>w*k2+1,c_=()=>$A()?n3:D.lvl,G5=w=>!!MA[w]&&(MA[w].lo<=c_()+3||D.maxStage>=Fc(w)),P_=w=>{const A=MA.findIndex(n=>w<=n.hi);return A<0?MA.length-1:A},r_=()=>!1,q5=0,Y5=[["farm","⚔","Luyện Công","Dịch chuyển tới bãi luyện công hợp cấp"],["dg","🏯","Phó Bản","Dịch chuyển vào phó bản cao nhất còn lượt, lần lượt đi hết; hết lượt thì luyện công"],["quest","📜","Nhiệm Vụ","Dịch chuyển tới bản đồ nhiệm vụ: Dã Tẩu, Sát Thủ, đi thuyền; xong thì luyện công"],["tower","🗼","Leo Tháp","Vào Thông Thiên Tháp leo liên tục từ tầng (kỷ lục − 4); gục ngã thì tự chuyển về Luyện Công"]],Bh=()=>Y5.find(w=>w[0]===(D.mode||"farm"))||Y5[0],va=function w(){const A=K5(),n=Object.keys(UA().ore).reduce((o,P)=>o+S("ore",P),0),t=Object.keys(UA().ht).reduce((o,P)=>o+S("ht",P),0),e=D.inv.concat(tA(),Object.values(D.eq)).filter(o=>o&&typeof Zt=="function"&&Zt(o)).length,a=Object.keys(UA().shard).filter(o=>Z0[o]&&S("shard",o)>=Z0[o]).length,s=Object.values(D.eq).filter(o=>o&&_3(o)).concat(D.inv.filter(_3)).filter(o=>!M3(o)).length,i=K8.map(([o])=>D.eq[o]).filter(Boolean);d("#t-forge").innerHTML=`
+    ${n?"":`<label class="small"><input type="checkbox" id="cAutoMap" ${D.autoMap===!1?"":"checked"}> Tự đổi bãi luyện công khi lên cấp</label>`}</div>`},ph=function(){let A=d("#modeSw");A||(A=document.createElement("div"),A.id="modeSw",A.innerHTML=`<button id="mswBtn"></button><div id="mswMenu" class="hidden">${Y5.map(t=>`<button data-msw="${t[0]}" title="${t[3]}">${t[1]} ${t[2]}</button>`).join("")}</div>`,d("#battle").appendChild(A),d("#mswBtn").onclick=t=>{t.stopPropagation(),d("#mswMenu").classList.toggle("hidden")},A.querySelectorAll("[data-msw]").forEach(t=>t.onclick=e=>{e.stopPropagation(),d("#mswMenu").classList.add("hidden"),mh(t.dataset.msw)}),document.addEventListener("pointerdown",t=>{A.contains(t.target)||d("#mswMenu").classList.add("hidden")})),A.classList.toggle("hidden",!D.fac);const n=Bh();d("#mswBtn").innerHTML=`Chế Độ: <b>${n[1]} ${n[2]}</b>${window.pkOn&&window.pkOn()?' <b style="color:#ff6a5a">· PK</b>':""} ▴`,A.querySelectorAll("[data-msw]").forEach(t=>t.classList.toggle("on",t.dataset.msw===n[0]))},o_=function(){document.querySelectorAll("[data-mode]").forEach(n=>n.onclick=()=>mh(n.dataset.mode));const A=d("#cAutoMap");A&&(A.onchange=()=>{D.autoMap=A.checked,A.checked&&a4(),k(),V()})},sE=3,Fc=w=>w*k2+1,c_=()=>$A()?n3:D.lvl,G5=w=>!!MA[w]&&(MA[w].lo<=c_()+3||D.maxStage>=Fc(w)),P_=w=>{const A=MA.findIndex(n=>w<=n.hi);return A<0?MA.length-1:A},r_=()=>!1,q5=0,Y5=[["farm","⚔","Luyện Công","Dịch chuyển tới bãi luyện công hợp cấp"],["dg","🏯","Phó Bản","Dịch chuyển vào phó bản cao nhất còn lượt, lần lượt đi hết; hết lượt thì luyện công"],["quest","📜","Nhiệm Vụ","Dịch chuyển tới bản đồ nhiệm vụ: Dã Tẩu, Sát Thủ, đi thuyền; xong thì luyện công"],["tower","🗼","Leo Tháp","Vào Thông Thiên Tháp leo liên tục từ tầng (kỷ lục − 4); gục ngã thì tự chuyển về Luyện Công"]],Bh=()=>Y5.find(w=>w[0]===(D.mode||"farm"))||Y5[0],va=function w(){const A=K5(),n=Object.keys(UA().ore).reduce((o,P)=>o+S("ore",P),0),t=Object.keys(UA().ht).reduce((o,P)=>o+S("ht",P),0),e=D.inv.concat(tA(),Object.values(D.eq)).filter(o=>o&&typeof Zt=="function"&&Zt(o)).length,a=Object.keys(UA().shard).filter(o=>Z0[o]&&S("shard",o)>=Z0[o]).length,s=Object.values(D.eq).filter(o=>o&&_3(o)).concat(D.inv.filter(_3)).filter(o=>!M3(o)).length,i=K8.map(([o])=>D.eq[o]).filter(Boolean);d("#t-forge").innerHTML=`
     <div class="card fcard"><div class="fic"><img src="img/ep/ht.png" alt=""></div><div><b>💎 Lò Ép Đồ</b> <small class="dim">tinh luyện Huyền Tinh · lấy thuộc tính · chế tạo phôi · khảm nạm đồ Tím</small>
       ${NA()?`<div class="small">Huyền Tinh <b>${t}</b> · đá thuộc tính <b>${n}</b> · phôi <b>${e}</b> · Kho Rèn <b>${tA().length}</b>/${h0}${A.ench?' · <span class="cp">có thể khảm</span>':""}${A.up?' · <span class="cp">thăng cấp được</span>':""}</div>
       <div class="btnrow"><button class="btn sm" data-ep="kham">Khảm nạm</button><button class="btn sm" data-ep="hut">Lấy thuộc tính</button><button class="btn sm" data-ep="phoi">Chế phôi</button><button class="btn sm" data-ep="tl">Tinh luyện</button><button class="btn sm" data-ep="box">Kho Rèn</button></div>`:""}</div></div>
@@ -745,24 +745,23 @@ const pkTick=now=>{
  N.ws.send(JSON.stringify({type:"pk_hit",to:best.id,dps:Math.round(dps)}));
 };
 
-// --- Nút bật/tắt PK ---
-let btn=null;
-const mkBtn=()=>{
- if(btn||!document.body)return;
- btn=document.createElement("button");
- btn.id="pkBtn";btn.type="button";
- btn.style.cssText="position:fixed;left:6px;top:calc(env(safe-area-inset-top,0px) + 196px);z-index:60;padding:4px 10px;font:600 12px/1.2 system-ui,sans-serif;border-radius:14px;border:1px solid #8a7a45;cursor:pointer;display:none";
- btn.onclick=()=>window.pkToggle();
- document.body.appendChild(btn);
-};
+// --- Mục "PK" trong menu Chế Độ ---
 const paintBtn=()=>{
- if(!btn)return;
- const show=!!(b&&b.user&&D&&D.fac&&D.lvl>=PK_MIN_LV&&F4()&&N.on);
- btn.style.display=show?"":"none";
- btn.textContent=N.pk?"⚔ PK: BẬT":"⚔ PK: TẮT";
- btn.style.background=N.pk?"rgba(150,30,30,.92)":"rgba(14,20,18,.88)";
- btn.style.color=N.pk?"#fff":"#d8cfa6";
+ const menu=document.getElementById("mswMenu");
+ if(!menu)return;
+ let it=document.getElementById("pkItem");
+ if(!it){
+  it=document.createElement("button");
+  it.id="pkItem";it.type="button";
+  it.title="PK: tự đánh và bị đánh bởi người chơi khác cũng bật PK (cần cấp "+PK_MIN_LV+", chỉ ở bãi luyện công)";
+  it.onclick=e=>{e.stopPropagation();menu.classList.add("hidden");window.pkToggle()};
+  menu.appendChild(it);
+ }
+ it.textContent=N.pk?"🔥 PK: Bật":"⚔ PK: Tắt";
+ it.classList.toggle("on",!!N.pk);
+ it.style.display=(b&&b.user&&D&&D.fac&&N.on)?"":"none";
 };
+const refreshMode=()=>{try{ph()}catch{}};
 
 const closeNet=()=>{const w=N.ws;N.ws=null;N.state=0;N.others.clear();N.last="";N.pk=false;if(w){try{w.close()}catch{}}};
 
@@ -805,7 +804,7 @@ const lookNow=()=>{
 window.othTick=function(){
  try{
   const now=Date.now();
-  if(now-N.uiAt>500){N.uiAt=now;if(N.pk&&!F4())N.pk=false;mkBtn();paintBtn()}
+  if(now-N.uiAt>500){N.uiAt=now;if(N.pk&&!F4()){N.pk=false;refreshMode()}paintBtn()}
   const want=N.on&&b&&b.user&&D&&D.fac;
   if(!want){if(N.ws||N.state)closeNet();return}
   if(N.state===0){if(now>=N.retryT*1e3+(N.failAt||0)){N.failAt=now;N.retryT=Math.max(N.retryT,3);connect()}return}
@@ -863,9 +862,10 @@ window.pkToggle=function(on){
  N.pk=on===undefined?!N.pk:!!on;
  N.last="";
  try{M(N.pk?"PK: BẬT — bạn có thể tấn công và bị tấn công":"PK: TẮT")}catch{}
- paintBtn();
+ paintBtn();refreshMode();
  return N.pk;
 };
+window.pkOn=function(){return!!N.pk};
 window.othDebug=function(){return{on:N.on,state:N.state,others:N.others.size,map:mapKey(),retryN:N.retryN,rx:N.rx,ign:N.ign,bad:N.bad,pk:N.pk}};
 })();
 })();
