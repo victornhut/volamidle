@@ -683,7 +683,7 @@ try{
 /* ===== Giang hồ online: nhìn thấy người chơi khác + PK (dùng hook othEnts/othDraw/othTick có sẵn) ===== */
 const NETK="vlidle_oth";
 // Cân bằng PK: cấp tối thiểu · trần sát thương mỗi đòn (% máu tối đa của nạn nhân) · hệ số sát thương · nhịp đánh (ms) · tầm đánh cận/xa · thời gian bất khả xâm phạm sau khi chết
-const PK_MIN_LV=30,PK_CAP=.04,PK_K=1,PK_GAP=500,PK_R_MELEE=150,PK_R_RANGED=330,PK_SAFE_MS=8000;
+const PK_MIN_LV=30,PK_CAP=.04,PK_K=1,PK_GAP=500,PK_R_MELEE=150,PK_R_RANGED=330,PK_SAFE_MS=8000,PK_CHASE=800;
 const N={rx:0,ign:0,bad:null,ws:null,state:0,retryT:0,retryN:0,others:new Map(),sentAt:0,hbAt:0,jAt:0,jj:null,last:"",pk:false,pkAt:0,pkNext:0,tgt:null,chaseAt:0,safeUntil:0,uiAt:0,
  on:(function(){try{return localStorage.getItem(NETK)!=="0"}catch{return true}})()};
 
@@ -753,23 +753,29 @@ const pkCast=(o,now)=>{
  return true;
 };
 
-// --- PK: mục tiêu chuột phải hoặc người gần nhất tự động đánh ---
+// --- PK: đánh liên tục vào mục tiêu đã khóa (bấm chuột), hoặc khi bật Auto thì tự tìm người gần nhất, đuổi theo và đánh ---
+const pkAlive=(o,key,now)=>o&&o.pk&&o.map===key&&now-o.seen<=3000&&o.hp!==0&&o.l>=PK_MIN_LV;
 const pkTick=now=>{
  if(!N.pk)return;
  if(!(D.lvl>=PK_MIN_LV)||!F4()||c.deadT>0||c.life<=0||now<N.safeUntil)return;
  const key=mapKey();if(!key)return;
  let tg=N.tgt?N.others.get(N.tgt):null;
- if(N.tgt&&(!tg||!tg.pk||tg.map!==key||now-tg.seen>3000)){N.tgt=null;tg=null}
- if(!tg){
-  let bd=1e9;
+ if(N.tgt&&!pkAlive(tg,key,now)){N.tgt=null;tg=null}
+ if(tg&&tg.safe)return;
+ if(!tg&&!H0()){
+  let bd=PK_CHASE;
   for(const o of N.others.values()){
-   if(!o.pk||o.safe||o.l<PK_MIN_LV||o.map!==key||now-o.seen>3000)continue;
+   if(!pkAlive(o,key,now)||o.safe)continue;
    const d=XA(v,{x:o.tx,y:o.ty});
    if(d<bd){bd=d;tg=o}
   }
  }
  if(!tg||now<N.pkNext)return;
- if(pkCast(tg,now)==="far"&&N.tgt===tg.id&&now-N.chaseAt>300){N.chaseAt=now;J.target={x:tg.tx,y:tg.ty}}
+ if(pkCast(tg,now)==="far"&&now-N.chaseAt>300){
+  N.chaseAt=now;
+  if(!H0())J.tmp=!0;
+  J.target={x:tg.tx,y:tg.ty};
+ }
 };
 
 // --- Chuột phải vào người chơi khác: chọn làm mục tiêu và tung chiêu ---
@@ -785,25 +791,27 @@ const hitOther=(cx,cy)=>{
  }
  return best;
 };
-const onRightDown=e=>{
- if(e.button!==2||!N.on||N.state!==2)return;
+const onMouseDown=e=>{
+ if((e.button!==0&&e.button!==2)||!N.on||N.state!==2)return;
  const o=hitOther(e.clientX,e.clientY);
- if(!o)return;
- e.preventDefault();e.stopImmediatePropagation();
- if(!N.pk){try{M("Bật PK trong menu Chế Độ để tấn công người chơi")}catch{}return}
- if(!o.pk){try{M(o.n+" chưa bật PK")}catch{}return}
+ if(!o){if(N.tgt){N.tgt=null}return}
+ const block=()=>{e.preventDefault();e.stopImmediatePropagation()};
+ if(!N.pk){if(e.button===2){block();try{M("Bật PK trong menu Chế Độ để tấn công người chơi")}catch{}}return}
+ if(!o.pk){if(e.button===2){block();try{M(o.n+" chưa bật PK")}catch{}}return}
+ block();
  N.tgt=o.id;
  try{M("Tấn công: "+o.n)}catch{}
  N.pkNext=0;pkTick(Date.now());
 };
-const onRightMenu=e=>{if(N.on&&N.state===2&&hitOther(e.clientX,e.clientY))e.preventDefault()};
+// Chặn menu "Save image / Inspect" của trình duyệt khi bấm chuột phải lên màn chơi.
+const onRightMenu=e=>{e.preventDefault()};
 // Canvas (z0) chỉ có sau khi game khởi động, nên gắn sự kiện muộn và chỉ một lần cho mỗi canvas.
 const bindRC=()=>{
  let cv=null;
  try{cv=z0}catch{}
  if(!cv||N.rcEl===cv)return;
  N.rcEl=cv;
- cv.addEventListener("pointerdown",onRightDown,true);
+ cv.addEventListener("pointerdown",onMouseDown,true);
  cv.addEventListener("contextmenu",onRightMenu,true);
 };
 
